@@ -1,21 +1,28 @@
 package dao;
 
 public class Album {
-	
-	private int album_id; 
+
+	private int album_id;
 	private String album;
-	
+	private String url;
+
 	public Album(int album_id, String album) {
 		this.album_id = album_id;
 		this.album = album;
 	}
-	
+
+	public Album(String album, String url) {
+		this.album = album;
+		this.url = url;
+
+	}
+
 	public Album(String album) {
 		this.album = album;
 	}
-	
+
 	public Album() {
-		
+
 	}
 
 	/**

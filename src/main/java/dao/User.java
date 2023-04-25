@@ -1,24 +1,27 @@
 package dao;
 
 public class User {
-	
+
 	private int user_id;
-	private String username; 
-	private String password; 
-	
-	public User(int user_id, String username, String password) {
+	private String username;
+	private String password;
+	private UserTypes userType;
+
+	public User(int user_id, String username, String password, UserTypes userType) {
 		this.user_id = user_id;
 		this.username = username;
 		this.password = password;
+		this.userType = userType;
 	}
-	
+
 	public User(String username, String password) {
 		this.username = username;
 		this.password = password;
+		this.userType = UserTypes.USER;
 	}
-	
+
 	public User() {
-		
+
 	}
 
 	/**
@@ -65,7 +68,12 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User [user_id=" + user_id + ", username=" + username + ", password=" + password + "]";
+		return "User{" +
+		       "user_id=" + user_id +
+		       ", username='" + username + '\'' +
+		       ", password='" + password + '\'' +
+		       ", userType=" + userType +
+		       '}';
 	}
 
 }
