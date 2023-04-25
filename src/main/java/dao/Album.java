@@ -8,7 +8,7 @@ public class Album {
 	private int album_id;
 	private String album;
 	private String url;
-	private List<Ratings> ratings = new ArrayList<>();
+	private final List<Ratings> ratings = new ArrayList<>();
 
 	public Album(int album_id, String album) {
 		this.album_id = album_id;
