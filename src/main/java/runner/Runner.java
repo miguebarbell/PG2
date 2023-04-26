@@ -36,7 +36,7 @@ public class Runner {
 
 		System.out.println(welcome + banner);
 		System.out.println(loginMenu);
-		
+
 		do {
 
 
@@ -60,6 +60,7 @@ public class Runner {
 					if (verifiedUser != null) {
 						// call menu function
 						System.out.println("You are logged in");
+						System.out.println(verifiedUser);
 						loggedMenu(verifiedUser, scan);
 
 
@@ -155,8 +156,8 @@ public class Runner {
 					int choice;
 					String progressChoice;
 					String[] progressStatus = { "not completed", "in-progress", "completed", "" };
-					
-					
+
+
 
 					progressMenu();
 
@@ -233,7 +234,7 @@ public class Runner {
 					String progressChoice2;
 					String[] progressStatus2 = { "not completed", "in-progress", "completed", "" };
 					progressUpdateMenu();
-					
+
 
 
 					choice2 = scan.nextInt();
@@ -298,7 +299,7 @@ public class Runner {
 					System.out.println("----------------------------------------------------------------------------");
 
 					viewAlbums(progList);
-					
+
 					System.out.println("\n");
 
 					break;
@@ -316,7 +317,7 @@ public class Runner {
 		} catch (InputMismatchException e) {
 			System.out.println("Invalid input, must enter a number");
 		} catch (TrackingException e) {
-			
+
 		} catch (NoSuchElementException e) {
 			System.out.println("Input was not recognized");
 		}
