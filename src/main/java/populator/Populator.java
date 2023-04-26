@@ -25,6 +25,13 @@ public class Populator {
 			statement.execute("CREATE TABLE progress (" + "user_id INT NOT NULL," + "album_id INT NOT NULL,"
 			                  + "progress varchar(255)," + "foreign key (user_id) references users(user_id),"
 			                  + "foreign key (album_id) references albums(album_id));");
+			statement.execute("CREATE TABLE ratings(" +
+			                  "rating_id INT auto_increment PRIMARY KEY, " +
+			                  "user_id INT NOT NULL, " +
+			                  "rating INT NOT NULL, " +
+			                  "album_id INT NOT NULL, " +
+			                  "foreign key (user_id) references users(user_id), " +
+			                  "foreign key (album_id) references albums(album_id))");
 			statement.execute("INSERT into users(username, password, user_type) values ('miguel', md5('root'), 0);");
 			statement.execute("INSERT into users(username, password, user_type) values ('talha', md5('root'), 0);");
 			statement.execute("INSERT into users(username, password, user_type) values ('jesus', md5('root'), 0);");
