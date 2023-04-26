@@ -388,6 +388,7 @@ public class Runner {
 					progressAlbum.getAlbum(), progress.getProgress());
 			else System.out.printf("\n%s - %s -> %s", progressAlbum.getAlbum_id(),
 					progressAlbum.getAlbum(), progress.getProgress());
+			System.out.println("\nprogressAlbum.getRating() = " + progressAlbum.getRating());
 		});
 	}
 

@@ -4,13 +4,15 @@ import java.util.List;
 
 public interface AlbumDao {
 
-	public Album getAlbumId(int a_id);
+	Album getAlbumId(int a_id);
 
-	public List<Album> getAllAlbums();
+	List<Album> getAllAlbums();
 
-	public boolean addAlbum(Album album);
+	boolean addAlbum(Album album);
 //TODO: add album as admin
 //	Album save(Album album);
+
+	boolean addRating(Ratings ratings, Integer userId, Integer albumId);
 
 /*public List<Employees> getAllEmployees();
 
