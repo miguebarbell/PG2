@@ -2,15 +2,20 @@ package dao;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class AlbumTest {
 
 	@Test
 	void getRating() {
-		Album album = new Album("Metallica");
-		album.addRating(Ratings.GOOD); //3
-		album.addRating(Ratings.AVERAGE); //2
-		assert album.getRating() == 2.5;
+		AlbumDaoSql albumDaoSql = new AlbumDaoSql();
+		int idAlbumToTest = 1;
+		albumDaoSql.addRating(Ratings.AVERAGE, 1, idAlbumToTest);
+		albumDaoSql.addRating(Ratings.BAD, 2, idAlbumToTest);
+		Album album = albumDaoSql.getAlbumId(idAlbumToTest);
+		assert 1.5 == album.getRating();
+		albumDaoSql.addRating(Ratings.THE_BEST, 2, idAlbumToTest);
+		album = albumDaoSql.getAlbumId(idAlbumToTest);
+		assert 3 == album.getRating();
+
+
 	}
 }
