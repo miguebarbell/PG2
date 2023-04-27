@@ -37,7 +37,7 @@ public class Populator {
 			statement.execute("CREATE TABLE tracks(" +
 			                  "track_id INT AUTO_INCREMENT PRIMARY KEY , " +
 			                  "season_id INT NOT NULL, " +
-			                  "number INT NOT NULL,"+
+			                  "number INT NOT NULL," +
 			                  "title VARCHAR(255) NOT NULL, " +
 			                  "foreign key (season_id) references seasons(season_id))");
 
@@ -62,6 +62,7 @@ public class Populator {
 			statement.execute("INSERT into users(username, password, user_type) values ('jesus', md5('root'), 0);");
 			statement.execute("INSERT into users(username, password) values ('sean', md5('root'));");
 
+			// BEEF TV SHOW
 			statement.execute("insert into albums(album) values('BEEF');");
 			statement.execute("INSERT INTO seasons(album_id, title) values (1, 'Season 1')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (1,1,'The Birds Don\\'t Sing, They " +
@@ -76,16 +77,41 @@ public class Populator {
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (1,9,'The Great Fabricator')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (1,10,'Figures of Light')");
 
-			statement.execute("insert into albums(album) values(\"Bob Dylan, 'Blood on the Tracks'\");");
-			statement.execute("insert into albums(album) values(\"Prince and the Revolution, 'Purple Rain'\");");
-			statement.execute("insert into albums(album) values(\"Fleetwood Mac, 'Rumours'\");");
-			statement.execute("insert into albums(album) values(\"Nirvana, 'Nevermind'\");");
-			statement.execute("insert into albums(album) values(\"The Beatles, 'Abbey Road'\");");
-			statement.execute("insert into albums(album) values(\"Stevie Wonder, 'Songs in the Key of Life'\");");
-			statement.execute("insert into albums(album) values(\"Joni Mitchell, 'Blue'\");");
-			statement.execute("insert into albums(album) values(\"The Beach Boys, 'Pet Sounds'\");");
-			statement.execute("insert into albums(album) values(\"Marvin Gaye, 'What's Going On'\");");
+			// The Boys
+			statement.execute("insert into albums(album) values('The Boys');");
+			statement.execute("INSERT INTO seasons(album_id, title) values (2, 'Season 1')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,1,'The Name of the Game')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,2,'Cherry')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,3,'Get Some')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,4,'The Female of the Species')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,5,'Good for the Soul')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,6,'The Innocents')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,7,'The Self-Preservation Society')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,8,'You Found Me')");
 
+			statement.execute("INSERT INTO seasons(album_id, title) values (2, 'Season 2')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,1,'The Big Ride')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,2,'Proper Preparation and Planning')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,3,'Over the Hill with the Swords of a" +
+			                  " Thousand')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,4,'Nothing Like It in the World')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,5,'We Gotta Go Now')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,6,'The Bloody Door Off')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,7,'Butcher, Baker, Candlestick " +
+			                  "Maker')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,8,'What I Know')");
+
+			statement.execute("INSERT INTO seasons(album_id, title) values (2, 'Season 3')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,1,'Payback')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,2,'The Only Man in the Sky')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,3,'Barbary Coast')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,4,'Glorious Five Year Plan')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,5,'The Last Time to Look on This " +
+			                  "World of Lies')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,6,'Herogasm')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,7,'Here Comes a Candle to Light You " +
+			                  "to Bed')");
+			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,8,'The Instant White-Hot Wild')");
 
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
