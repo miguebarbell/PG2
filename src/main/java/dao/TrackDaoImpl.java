@@ -29,6 +29,7 @@ public class TrackDaoImpl implements TrackDao {
 
 		@Override
 	public boolean addRating(RatingType rating, int trackId, int userId) {
+		//FIXME: update rating if the user already has one for the same track
 		String sql = "INSERT INTO ratings(user_id, rating, track_id) VALUES (?, ?,?)";
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, userId);

@@ -9,7 +9,7 @@ public class Album {
 	private String album;
 	private String url;
 	private String description;
-	private final List<Ratings> ratings = new ArrayList<>();
+	private final List<RatingType> ratings = new ArrayList<>();
 	private final List<Track> tracks = new ArrayList<>();
 
 	public Album(int album_id, String album) {
@@ -59,7 +59,7 @@ public class Album {
 		                       .sum()) / ratings.size();
 	}
 
-	public void addRating(Ratings rating) {
+	public void addRating(RatingType rating) {
 		ratings.add(rating);
 	}
 

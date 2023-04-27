@@ -26,7 +26,7 @@ public class AlbumDaoSql implements AlbumDao {
 
 			if (rs.next()) {
 				int album_id = rs.getInt("album_id");
-				List<Ratings> ratings = getRatingByAlbumId(album_id);
+				List<RatingType> ratings = getRatingByAlbumId(album_id);
 				String album_name = rs.getString("album");
 
 
@@ -57,7 +57,7 @@ public class AlbumDaoSql implements AlbumDao {
 
 			while (rs.next()) {
 				int id = rs.getInt("album_id");
-				List<Ratings> ratings = getRatingByAlbumId(id);
+				List<RatingType> ratings = getRatingByAlbumId(id);
 
 				String albumN = rs.getString("album");
 
@@ -93,7 +93,7 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 	@Override
-	public boolean addRating(Ratings rating, Integer userId, Integer albumId) {
+	public boolean addRating(RatingType rating, Integer userId, Integer albumId) {
 		String updateSql = "UPDATE ratings SET rating = ? WHERE user_id = ? AND album_id = ?";
 		String searchSql = "SELECT * FROM ratings WHERE user_id = ? AND album_id = ?";
 		String sql = "INSERT INTO ratings(user_id, rating, album_id) values (?,?,?)";
@@ -129,16 +129,16 @@ public class AlbumDaoSql implements AlbumDao {
 		return false;
 	}
 
-	List<Ratings> getRatingByAlbumId(Integer albumId) {
+	List<RatingType> getRatingByAlbumId(Integer albumId) {
 		String sql = "SELECT * FROM ratings WHERE track_id = ?";
-		List<Ratings> ratings = new ArrayList<>();
+		List<RatingType> ratings = new ArrayList<>();
 		try (
 				PreparedStatement pstmt = conn.prepareStatement(sql)
 		) {
 			pstmt.setInt(1, albumId);
 			ResultSet resultSet = pstmt.executeQuery();
 			while (resultSet.next()) {
-				ratings.add(Ratings.values()[resultSet.getInt(3)]);
+				ratings.add(RatingType.values()[resultSet.getInt(3)]);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);

@@ -12,7 +12,7 @@ public interface AlbumDao {
 //TODO: add album as admin
 //	Album save(Album album);
 
-	boolean addRating(Ratings ratings, Integer userId, Integer albumId);
+	boolean addRating(RatingType ratings, Integer userId, Integer albumId);
 
 /*public List<Employees> getAllEmployees();
 
