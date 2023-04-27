@@ -8,17 +8,13 @@ public class Album {
 	private int album_id;
 	private String album;
 	private String url;
+	private String description;
 	private final List<Ratings> ratings = new ArrayList<>();
+	private final List<Track> tracks = new ArrayList<>();
 
 	public Album(int album_id, String album) {
 		this.album_id = album_id;
 		this.album = album;
-	}
-
-	public Album(String album, String url) {
-		this.album = album;
-		this.url = url;
-
 	}
 
 	public Album(String album) {

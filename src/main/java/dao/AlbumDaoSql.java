@@ -130,7 +130,7 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 	List<Ratings> getRatingByAlbumId(Integer albumId) {
-		String sql = "SELECT * FROM ratings WHERE album_id = ?";
+		String sql = "SELECT * FROM ratings WHERE track_id = ?";
 		List<Ratings> ratings = new ArrayList<>();
 		try (
 				PreparedStatement pstmt = conn.prepareStatement(sql)

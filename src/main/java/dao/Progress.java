@@ -1,19 +1,20 @@
 package dao;
 
 public class Progress {
-	
+
 	private int user_id;
-	private int album_id;
+	private int track_id;
 	private String progress;
-	
-	public Progress(int user_id, int album_id, String progress) {
+
+	public Progress(int user_id, int track_id, String progress) {
+		//FIXME: progress should be an integer
 		this.user_id = user_id;
-		this.album_id = album_id;
+		this.track_id = track_id;
 		this.progress = progress;
 	}
 
 	public Progress() {
-		
+
 	}
 
 	/**
@@ -33,15 +34,15 @@ public class Progress {
 	/**
 	 * @return the album_id
 	 */
-	public int getAlbum_id() {
-		return album_id;
+	public int getTrack_id() {
+		return track_id;
 	}
 
 	/**
-	 * @param album_id the album_id to set
+	 * @param track_id the album_id to set
 	 */
-	public void setAlbum_id(int album_id) {
-		this.album_id = album_id;
+	public void setTrack_id(int track_id) {
+		this.track_id = track_id;
 	}
 
 	/**
@@ -60,8 +61,8 @@ public class Progress {
 
 	@Override
 	public String toString() {
-		return "Progress [user_id=" + user_id + ", album_id=" + album_id + ", progress=" + progress + "]";
+		return "Progress [user_id=" + user_id + ", track_id=" + track_id + ", progress=" + progress + "]";
 	}
-	
-	
+
+
 }
