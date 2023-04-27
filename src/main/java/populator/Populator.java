@@ -8,7 +8,7 @@ import java.sql.Statement;
 import connection.ConnectionManager;
 
 public class Populator {
-	private static Connection conn = ConnectionManager.getConnection();
+	private static final Connection conn = ConnectionManager.getConnection();
 
 	public static void reset() {
 
