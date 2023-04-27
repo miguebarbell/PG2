@@ -1,8 +1,8 @@
 package dao;
 
 public interface TrackDao {
-	Float getRating();
-	void addRating(Ratings rating);
-	Track save(Track track);
+	Integer getRatingByTrackId(int trackId);
+	boolean addRating(RatingType rating, int trackId, int userId);
+	boolean save(Track track);
 
 }
