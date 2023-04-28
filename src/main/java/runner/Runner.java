@@ -35,41 +35,38 @@ public class Runner {
 				+ "    | |     \\  /     ____) | | | | (_) \\ V  V /     | | | | (_| | (__|   <  __/ |   \r\n"
 				+ "    |_|      \\/     |_____/|_| |_|\\___/ \\_/\\_/      |_|_|  \\__,_|\\___|_|\\_\\___|_|   \r\n"
 				+ "                                                                                    \r\n"
-				+ "                                                                                    \r\n"
 				+ c.RESET;
 		String loginMenu = "1. Login\n2. Register\n3. Quit\nPlease choose (1, 2, or 3):" + c.YELLOW;
 
 		boolean isLogging = true;
 
-		System.out.println(welcome + banner);
-		System.out.print(loginMenu);
+		System.out.print(welcome + banner + loginMenu);
 
 		do {
 
 
 			String ans = scan.nextLine().toUpperCase();
+			System.out.print(c.RESET);
 			 if (ans.isEmpty()) {
-				System.out.println(welcome + banner);
-				System.out.println(loginMenu);
+				System.out.print(banner + loginMenu);
 				continue;
 			}
 
 			switch (ans.charAt(0)) {
 			case 'L':
 			case '1':
-				System.out.println("What's your username?");
+				System.out.print("username:");
 				try {
 					String username = scan.nextLine();
-					System.out.println("\nWhat's your password?");
+					System.out.print("password:");
 					String password = scan.nextLine();
+					
 					User loggedUser = new User(username, password);
 					User verifiedUser = userCaller.loginUser(loggedUser);
 					if (verifiedUser != null) {
 						// call menu function
-						System.out.println("You are logged in");
-						System.out.println(verifiedUser);
+						System.out.println(c.GREEN + "You have successfully logged in " + verifiedUser.getUsername() + "!" + c.RESET);
 						loggedMenu(verifiedUser, scan);
-
 
 					} else {
 						// throw LoginException and catch it
@@ -101,19 +98,19 @@ public class Runner {
 				} else {
 					System.out.println("\nError, try again with other username.");
 				}
-				System.out.println(welcome + banner);
-				System.out.println(loginMenu);
+				System.out.print(banner + loginMenu);
 				break;
 
 			case 'Q':
-			case '0':
+			case '3':
 				isLogging = false;
-				System.out.println("Thanks for using our progress tracking app. Have a great day!");
+				System.out.println(c.GREEN_BOLD_BRIGHT + "Thanks for using our progress tracking app. Have a great day!" + c.RESET);
 
 				break;
 
 			default:
-				System.out.println("Input must be L for login or Q for quit");
+				System.out.println(c.RED + "Invalid input. Please try again." + c.RESET);
+				System.out.print(banner + loginMenu);
 				break;
 			}
 
