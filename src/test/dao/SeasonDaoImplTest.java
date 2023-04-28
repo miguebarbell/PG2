@@ -36,6 +36,8 @@ class SeasonDaoImplTest {
 		Float ratingBySeasonId = dao.getRatingBySeasonId(3);
 		System.out.println(ratingBySeasonId);
 		assert ratingBySeasonId == 2.5;
+		System.out.println("dao.getRatingBySeasonId(1) = " + dao.getRatingBySeasonId(1));
+		System.out.println("dao.getRatingBySeasonId(2) = " + dao.getRatingBySeasonId(2));
 	}
 
 	@Test

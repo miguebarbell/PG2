@@ -12,18 +12,21 @@ public class TrackDaoImpl implements TrackDao {
 	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
-	public Integer getRatingByTrackId(int trackId) {
+	public Float getRatingByTrackId(int trackId) {
 		String sql = "SELECT rating FROM ratings WHERE track_id = ?";
+		Float rating = 0f;
+		int count = 0;
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setInt(1, trackId);
 			ResultSet resultSet = ps.executeQuery();
-			if (resultSet.next()) {
-				return resultSet.getInt(1);
+			while (resultSet.next()) {
+				rating += resultSet.getInt(1);
+				count++;
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-		return null;
+		return count > 0 ? rating / count : null;
 	}
 
 
@@ -39,9 +42,9 @@ public class TrackDaoImpl implements TrackDao {
 			qps.setInt(2, userId);
 			ResultSet resultSet = qps.executeQuery();
 			if (resultSet.next()) {
-				ustmt.setInt(1, userId);
-				ustmt.setInt(2, rating.ordinal());
-				ustmt.setInt(3, trackId);
+				ustmt.setInt(1, rating.ordinal());
+				ustmt.setInt(2, trackId);
+				ustmt.setInt(3, userId);
 				int rows = ustmt.executeUpdate();
 				return rows > 0;
 			} else {

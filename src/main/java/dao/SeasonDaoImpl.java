@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class SeasonDaoImpl implements SeasonDao {
 
@@ -53,14 +55,19 @@ public class SeasonDaoImpl implements SeasonDao {
 
 	@Override
 	public Float getRatingBySeasonId(int seasonId) {
+		AtomicReference<Float> rating = new AtomicReference<>(0.0f);
+		AtomicInteger count = new AtomicInteger(0);
 		TrackDaoImpl trackDao = new TrackDaoImpl();
-		return (float) getEpisodesBySeasonId(seasonId)
-				.stream()
-				.map(episode -> trackDao.getRatingByTrackId(episode.getId()))
-				.filter(Objects::nonNull)
-				.mapToInt(Integer::intValue)
-				.average()
-				.orElse(0.0f);
+		List<Track> episodesBySeasonId = getEpisodesBySeasonId(seasonId);
+		episodesBySeasonId.stream().forEach(episode -> {
+					Float ratingByTrackId = trackDao.getRatingByTrackId(episode.getId());
+					if (ratingByTrackId != null) {
+						count.incrementAndGet();
+						rating.updateAndGet(v -> v + ratingByTrackId);
+					}
+				}
+		);
+		return count.get() > 0 ? rating.get() / count.get() : null;
 	}
 
 	@Override

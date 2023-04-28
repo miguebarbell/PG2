@@ -12,7 +12,7 @@ class TrackDaoImplTest {
 	@Order(2)
 	@DisplayName("Rating for episode id 1 should be 3")
 	void getRatingByTrackId() {
-		Integer ratingByTrackId = dao.getRatingByTrackId(1);
+		Float ratingByTrackId = dao.getRatingByTrackId(1);
 		assert ratingByTrackId == 3;
 	}
 
@@ -21,7 +21,11 @@ class TrackDaoImplTest {
 	@DisplayName("Adding rating of GOOD to episode id 1")
 	void addRating() {
 		boolean ratingBolean = dao.addRating(RatingType.GOOD, 1, 1);
+		boolean ratingBolean2
+				= dao.addRating(RatingType.BAD, 1, 2);
 		assertTrue(ratingBolean);
+		assertTrue(ratingBolean2);
+
 	}
 
 	@Test

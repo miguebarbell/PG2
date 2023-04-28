@@ -5,6 +5,8 @@ import connection.ConnectionManager;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AlbumDaoSql implements AlbumDao {
 
@@ -85,15 +87,17 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 	Float getRatingByAlbumId(Integer albumId) {
+		AtomicReference<Float> rating = new AtomicReference<>(0f);
+		AtomicInteger count = new AtomicInteger();
 		SeasonDaoImpl seasonDao = new SeasonDaoImpl();
-		return (float) seasonDao
-				.getSeasonsByTvshowId(albumId)
-				.stream()
-				.filter(season -> {
-					Float rating = seasonDao.getRatingBySeasonId(season.getSeason_id());
-					return rating != null;
-				})
-				.mapToDouble(season -> seasonDao.getRatingBySeasonId(season.getSeason_id()))
-				.average().orElse(0.0f);
+		List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(albumId);
+		seasonsByTvshowId.forEach(season -> {
+			Float ratingBySeasonId = seasonDao.getRatingBySeasonId(season.getSeason_id());
+			if (ratingBySeasonId != null) {
+				rating.updateAndGet(v -> v + ratingBySeasonId);
+				count.getAndIncrement();
+			}
+		});
+		return count.get() > 0 ? rating.get()/count.get() : null;
 	}
 }
