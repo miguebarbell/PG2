@@ -34,6 +34,7 @@ class SeasonDaoImplTest {
 		trackDao.addRating(RatingType.AVERAGE, 20, 1);
 		trackDao.addRating(RatingType.GOOD, 21, 1);
 		Float ratingBySeasonId = dao.getRatingBySeasonId(3);
+		System.out.println(ratingBySeasonId);
 		assert ratingBySeasonId == 2.5;
 	}
 
