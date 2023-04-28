@@ -27,39 +27,31 @@ public class Runner {
 
 		UserDaoSql userCaller = new UserDaoSql();
 		String welcome = c.GREEN_BOLD + "\nWelcome to our tracking app." + c.RESET;
-		String banner = c.PURPLE + c.WHITE_BACKGROUND + "\r\n"
-				+ "  _________      __   _____ _                     _______             _             \r\n"
-				+ " |__   __\\ \\    / /  / ____| |                   |__   __|           | |            \r\n"
-				+ "    | |   \\ \\  / /  | (___ | |__   _____      __    | |_ __ __ _  ___| | _____ _ __ \r\n"
-				+ "    | |    \\ \\/ /    \\___ \\| '_ \\ / _ \\ \\ /\\ / /    | | '__/ _` |/ __| |/ / _ \\ '__|\r\n"
-				+ "    | |     \\  /     ____) | | | | (_) \\ V  V /     | | | | (_| | (__|   <  __/ |   \r\n"
-				+ "    |_|      \\/     |_____/|_| |_|\\___/ \\_/\\_/      |_|_|  \\__,_|\\___|_|\\_\\___|_|   \r\n"
-				+ "                                                                                    \r\n"
-				+ c.RESET;
 		String loginMenu = "1. Login\n2. Register\n3. Quit\nPlease choose (1, 2, or 3):" + c.YELLOW;
 
 		boolean isLogging = true;
 
-		System.out.print(welcome + banner + loginMenu);
+		clear();
+		System.out.print(welcome + "\n" + loginMenu);
 
 		do {
-
-
 			String ans = scan.nextLine().toUpperCase();
 			System.out.print(c.RESET);
 			 if (ans.isEmpty()) {
-				System.out.print(banner + loginMenu);
+				clear();
+				System.out.print(loginMenu);
 				continue;
 			}
 
 			switch (ans.charAt(0)) {
 			case 'L':
 			case '1':
-				System.out.print("username:");
+				System.out.print("\nusername:" + c.YELLOW);
 				try {
 					String username = scan.nextLine();
-					System.out.print("password:");
+					System.out.print(c.RESET + "password:" + c.YELLOW);
 					String password = scan.nextLine();
+					System.out.println(c.RESET);
 					
 					User loggedUser = new User(username, password);
 					User verifiedUser = userCaller.loginUser(loggedUser);
@@ -80,7 +72,9 @@ public class Runner {
 					e.printStackTrace();
 					System.out.println("Account not found, please try again");
 				} catch (LoginException e) {
-					System.out.println("login failed");
+					clear();
+					System.out.println(c.RED + "Login failed." + c.RESET);
+					System.out.print(loginMenu);
 				}
 				break;
 			case 'R':
@@ -98,7 +92,8 @@ public class Runner {
 				} else {
 					System.out.println("\nError, try again with other username.");
 				}
-				System.out.print(banner + loginMenu);
+				clear();
+				System.out.print(loginMenu);
 				break;
 
 			case 'Q':
@@ -109,8 +104,9 @@ public class Runner {
 				break;
 
 			default:
+				clear();
 				System.out.println(c.RED + "Invalid input. Please try again." + c.RESET);
-				System.out.print(banner + loginMenu);
+				System.out.print(loginMenu);
 				break;
 			}
 
@@ -119,6 +115,24 @@ public class Runner {
 		scan.close();
 	}
 
+	private static void clear() {
+		StringBuilder sb = new StringBuilder();
+		for(int i = 0; i < 50; i++)
+			sb.append("\n");
+		String banner = c.PURPLE + c.WHITE_BACKGROUND + "\r\n"
+				+ "  _________      __   _____ _                     _______             _             \r\n"
+				+ " |__   __\\ \\    / /  / ____| |                   |__   __|           | |            \r\n"
+				+ "    | |   \\ \\  / /  | (___ | |__   _____      __    | |_ __ __ _  ___| | _____ _ __ \r\n"
+				+ "    | |    \\ \\/ /    \\___ \\| '_ \\ / _ \\ \\ /\\ / /    | | '__/ _` |/ __| |/ / _ \\ '__|\r\n"
+				+ "    | |     \\  /     ____) | | | | (_) \\ V  V /     | | | | (_| | (__|   <  __/ |   \r\n"
+				+ "    |_|      \\/     |_____/|_| |_|\\___/ \\_/\\_/      |_|_|  \\__,_|\\___|_|\\_\\___|_|   \r\n"
+				+ "                                                                                    \r\n"
+				+ c.RESET;
+		sb.append(banner);
+		
+		System.out.println(sb);
+	}
+	
 	public static void loggedMenu(User user, Scanner scan) {
 
 		AlbumDaoSql albumCaller = new AlbumDaoSql();
