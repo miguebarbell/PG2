@@ -1,24 +1,16 @@
 package dao;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Album {
 
 	private int album_id;
 	private String album;
 	private String url;
-	private final List<Ratings> ratings = new ArrayList<>();
+	private String description;
+	private Float rating;
 
 	public Album(int album_id, String album) {
 		this.album_id = album_id;
 		this.album = album;
-	}
-
-	public Album(String album, String url) {
-		this.album = album;
-		this.url = url;
-
 	}
 
 	public Album(String album) {
@@ -58,13 +50,11 @@ public class Album {
 	}
 
 	public Float getRating() {
-		return (float) (ratings.stream()
-		                       .mapToInt(Enum::ordinal)
-		                       .sum()) / ratings.size();
+		return this.rating;
 	}
 
-	public void addRating(Ratings rating) {
-		ratings.add(rating);
+	public void setRating(Float rating) {
+		this.rating = rating;
 	}
 
 	@Override

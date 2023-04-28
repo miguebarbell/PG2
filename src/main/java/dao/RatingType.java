@@ -1,6 +1,6 @@
 package dao;
 
-public enum Ratings {
+public enum RatingType {
 	REALLY_BAD(0),
 	BAD(1),
 	AVERAGE(2),
@@ -8,7 +8,7 @@ public enum Ratings {
 	THE_BEST(4);
 	private final int value;
 
-	Ratings(int value) {
+	RatingType(int value) {
 		this.value = value;
 	}
 
