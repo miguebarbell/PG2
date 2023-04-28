@@ -393,14 +393,14 @@ public class Runner {
 	public static void viewAlbums(List<Progress> progList) {
 
 		AlbumDaoSql albumCaller = new AlbumDaoSql();
-		if (progList.isEmpty()) {
+		if (null == progList || progList.isEmpty()) {
 			System.out.println("\nYou aren't tracking any albums.\n");
 		}
 		List<Album> albums = albumCaller.getAllAlbums();
 		progList.forEach(progress -> {
 
 			Album progressAlbum =
-					albums.stream().filter(album -> album.getAlbum_id() == progress.getAlbum_id())
+					albums.stream().filter(album -> album.getAlbum_id() == progress.getTrack_id())
 					      .findFirst().get();
 			if (progressAlbum.getAlbum_id() < 10)	System.out.printf("\n %s - %s -> %s", progressAlbum.getAlbum_id(),
 					progressAlbum.getAlbum(), progress.getProgress());
