@@ -1,16 +1,15 @@
 package dao;
 
+import connection.ConnectionManager;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import connection.ConnectionManager;
-import encoder.HasherImpl;
-
 public class UserDaoSql implements UserDao{
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public User getUsername(String username) {

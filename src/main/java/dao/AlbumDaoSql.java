@@ -1,16 +1,24 @@
 package dao;
 
 import connection.ConnectionManager;
+import info.movito.themoviedbapi.*;
+import info.movito.themoviedbapi.model.tv.TvEpisode;
+import info.movito.themoviedbapi.model.tv.TvSeason;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AlbumDaoSql implements AlbumDao {
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
+	Properties props = new Properties();
 
 	@Override
 	public Album getAlbumId(int a_id) {
@@ -26,9 +34,7 @@ public class AlbumDaoSql implements AlbumDao {
 				int album_id = rs.getInt("album_id");
 				String album_name = rs.getString("album");
 
-
 				album = new Album(album_id, album_name);
-
 
 			}
 
@@ -68,23 +74,52 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 	@Override
-	public boolean addAlbum(Album album) {
+	public Integer addAlbum(Album album) {
 
-		try (PreparedStatement pstmt = conn.prepareStatement("INSERT into albums(album)values(?)")) {
+		try (PreparedStatement pstmt = conn.prepareStatement("INSERT into albums(album)values(?)", Statement.RETURN_GENERATED_KEYS)) {
 
 			pstmt.setString(1, album.getAlbum());
 
 			int count = pstmt.executeUpdate();
-
-			if (count > 0) {
-				return true;
-			}
+			ResultSet generatedKeys = pstmt.getGeneratedKeys();
+			if (generatedKeys.next()) return generatedKeys.getInt(1);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			System.out.println("album add failed");
 		}
+		return 0;
+	}
+
+	@Override
+	public boolean addByCode(Integer code) {
+		try {
+			props.load(new FileInputStream("resources/config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String key = props.getProperty("key");
+		String url = "https://api.themoviedb.org/3/tv/%s?api_key=%s".formatted(code, key);
+		TmdbApi tmdbApi = new TmdbApi(key);
+		TvSeries newSerie = tmdbApi.getTvSeries().getSeries(code, "en");
+		String name = newSerie.getOriginalName();
+		System.out.println("name = " + name);
+		String description = newSerie.getOverview();
+		System.out.println("description = " + description);
+		List<TvSeason> seasons = newSerie.getSeasons();
+		seasons.forEach(season -> {
+			String seasonOverview = season.getOverview();
+			String seasonName = season.getName();
+			int seasonNumber = season.getSeasonNumber();
+			TvSeason result = tmdbApi.getTvSeasons().getSeason(code,seasonNumber , "en", TmdbTvSeasons.SeasonMethod.values());
+			List<TvEpisode> episodes = result.getEpisodes();
+			episodes.forEach(episode -> {
+				int episodeNumber = episode.getEpisodeNumber();
+				String episodeName = episode.getName();
+			});
+		});
 		return false;
 	}
+
 
 	Float getRatingByAlbumId(Integer albumId) {
 		AtomicReference<Float> rating = new AtomicReference<>(0f);
@@ -98,6 +133,6 @@ public class AlbumDaoSql implements AlbumDao {
 				count.getAndIncrement();
 			}
 		});
-		return count.get() > 0 ? rating.get()/count.get() : null;
+		return count.get() > 0 ? rating.get() / count.get() : null;
 	}
 }

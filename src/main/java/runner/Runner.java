@@ -363,8 +363,8 @@ public class Runner {
 		String albumName = testVar + scan.nextLine();
 
 		Album albumAdded = new Album(albumName);
-		boolean addResult = albumCaller.addAlbum(albumAdded);
-		if (addResult) {
+		int addResult = albumCaller.addAlbum(albumAdded);
+		if (addResult > 0) {
 			System.out.println(albumAdded);
 			System.out.println("Album successfully added");
 		} else {

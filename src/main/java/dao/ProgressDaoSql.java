@@ -12,7 +12,7 @@ import connection.ConnectionManager;
 
 public class ProgressDaoSql implements ProgressDao {
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public List<Progress> getAllUserTrackers(int u_id) {

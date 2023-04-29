@@ -8,5 +8,7 @@ public interface AlbumDao {
 
 	List<Album> getAllAlbums();
 
-	boolean addAlbum(Album album);
+	Integer addAlbum(Album album);
+
+	boolean addByCode(Integer code);
 }

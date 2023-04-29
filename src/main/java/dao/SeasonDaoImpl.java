@@ -2,35 +2,28 @@ package dao;
 
 import connection.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.OptionalDouble;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SeasonDaoImpl implements SeasonDao {
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
-	public boolean save(Season season) {
+	public Integer save(Season season) {
 		String sql = "INSERT INTO seasons(album_id, title) VALUES (?, ?)";
-		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
 			ps.setInt(1, season.getTvshow_id());
 			ps.setString(2, season.getTitle());
 			int rows = ps.executeUpdate();
-			if (rows > 0) {
-				return true;
-			}
+			ResultSet generatedKeys = ps.getGeneratedKeys();
+			return generatedKeys.next() ? generatedKeys.getInt(1) : 0;
 		} catch (SQLException e) {
-			return false;
+			return 0;
 		}
-		return false;
 	}
 
 	@Override
@@ -59,7 +52,7 @@ public class SeasonDaoImpl implements SeasonDao {
 		AtomicInteger count = new AtomicInteger(0);
 		TrackDaoImpl trackDao = new TrackDaoImpl();
 		List<Track> episodesBySeasonId = getEpisodesBySeasonId(seasonId);
-		episodesBySeasonId.stream().forEach(episode -> {
+		episodesBySeasonId.forEach(episode -> {
 					Float ratingByTrackId = trackDao.getRatingByTrackId(episode.getId());
 					if (ratingByTrackId != null) {
 						count.incrementAndGet();
