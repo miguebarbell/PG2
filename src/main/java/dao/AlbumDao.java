@@ -11,5 +11,5 @@ public interface AlbumDao {
 	Integer addAlbum(Album album);
 
 	boolean addByCode(Integer code);
-	void searchByTitle(String title);
+	List<TvSerieDTO> searchByTitle(String title);
 }

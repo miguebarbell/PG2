@@ -125,25 +125,28 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 	@Override
-	public void searchByTitle(String title) {
+	public List<TvSerieDTO> searchByTitle(String title) {
 		try {
 			props.load(new FileInputStream("resources/config.properties"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		List<TvSerieDTO> listOfResults = new ArrayList<>();
 		TmdbApi tmdbApi = new TmdbApi(props.getProperty("key"));
 		List<TvSeries> results = tmdbApi.getSearch().searchTv(title, "en", 1).getResults();
 		results.forEach(tvSerie -> {
 			int id = tvSerie.getId();
 			String name = tvSerie.getOriginalName();
 			String overview = tvSerie.getOverview();
-			List<Person> createdBy = tvSerie.getCreatedBy();
+//			List<Person> createdBy = tvSerie.getCreatedBy();
 			String firstAirDate = tvSerie.getFirstAirDate();
-			List<String> originCountry = tvSerie.getOriginCountry();
+//			List<String> originCountry = tvSerie.getOriginCountry();
 			TvSeries serie = tmdbApi.getTvSeries().getSeries(id, "en");
 			int numberOfEpisodes = serie.getNumberOfEpisodes();
 			int numberOfSeasons = serie.getNumberOfSeasons();
+			listOfResults.add(new TvSerieDTO(name, overview, firstAirDate, numberOfSeasons, numberOfEpisodes));
 		});
+		return listOfResults;
 	}
 
 	Float getRatingByAlbumId(Integer albumId) {

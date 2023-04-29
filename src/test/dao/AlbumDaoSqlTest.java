@@ -2,6 +2,7 @@ package dao;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 class AlbumDaoSqlTest {
@@ -10,9 +11,18 @@ class AlbumDaoSqlTest {
 
 	@Test
 	void searchByTitle() {
-		dao.searchByTitle("Mandalorian");
-		dao.searchByTitle("How I meet your mother");
-		dao.searchByTitle("Below Deck");
+		String firstSearch = "Mandalorian";
+		dao.searchByTitle(firstSearch).forEach(title -> {
+			assert title.name().contains(firstSearch);
+		});
+		String secondSearch = "How I meet your mother";
+		dao.searchByTitle(secondSearch).forEach(title -> {
+			assert title.name().contains(secondSearch);
+		});
+		String thirdSearch = "Below Deck";
+		dao.searchByTitle(thirdSearch).forEach(title -> {
+			assert title.name().contains(thirdSearch);
+		});
 	}
 	@Test
 	void api() {
