@@ -2,6 +2,7 @@ package dao;
 
 import connection.ConnectionManager;
 import info.movito.themoviedbapi.*;
+import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+
 
 public class AlbumDaoSql implements AlbumDao {
 
@@ -84,14 +86,15 @@ public class AlbumDaoSql implements AlbumDao {
 			ResultSet generatedKeys = pstmt.getGeneratedKeys();
 			if (generatedKeys.next()) return generatedKeys.getInt(1);
 		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("album add failed");
+			System.out.println("TV SHOW: '%s' is already in the database".formatted(album.getAlbum()));
 		}
 		return 0;
 	}
 
 	@Override
 	public boolean addByCode(Integer code) {
+		SeasonDaoImpl seasonDao = new SeasonDaoImpl();
+		TrackDaoImpl trackDao = new TrackDaoImpl();
 		try {
 			props.load(new FileInputStream("resources/config.properties"));
 		} catch (IOException e) {
@@ -102,24 +105,46 @@ public class AlbumDaoSql implements AlbumDao {
 		TmdbApi tmdbApi = new TmdbApi(key);
 		TvSeries newSerie = tmdbApi.getTvSeries().getSeries(code, "en");
 		String name = newSerie.getOriginalName();
-		System.out.println("name = " + name);
-		String description = newSerie.getOverview();
-		System.out.println("description = " + description);
+//		String description = newSerie.getOverview();
 		List<TvSeason> seasons = newSerie.getSeasons();
-		seasons.forEach(season -> {
-			String seasonOverview = season.getOverview();
-			String seasonName = season.getName();
-			int seasonNumber = season.getSeasonNumber();
-			TvSeason result = tmdbApi.getTvSeasons().getSeason(code,seasonNumber , "en", TmdbTvSeasons.SeasonMethod.values());
-			List<TvEpisode> episodes = result.getEpisodes();
-			episodes.forEach(episode -> {
-				int episodeNumber = episode.getEpisodeNumber();
-				String episodeName = episode.getName();
+			Integer newAlbumId = addAlbum(new Album(name));
+			seasons.forEach(season -> {
+//			String seasonOverview = season.getOverview();
+				String seasonName = season.getName();
+				int seasonNumber = season.getSeasonNumber();
+				Integer newSeasonId = seasonDao.save(new Season(seasonName, newAlbumId));
+				TvSeason result = tmdbApi.getTvSeasons().getSeason(code, seasonNumber, "en", TmdbTvSeasons.SeasonMethod.values());
+				List<TvEpisode> episodes = result.getEpisodes();
+				episodes.forEach(episode -> {
+					int episodeNumber = episode.getEpisodeNumber();
+					String episodeName = episode.getName();
+					trackDao.save(new Track(episodeName, episodeNumber, newSeasonId));
+				});
 			});
-		});
-		return false;
+			return true;
 	}
 
+	@Override
+	public void searchByTitle(String title) {
+		try {
+			props.load(new FileInputStream("resources/config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		TmdbApi tmdbApi = new TmdbApi(props.getProperty("key"));
+		List<TvSeries> results = tmdbApi.getSearch().searchTv(title, "en", 1).getResults();
+		results.forEach(tvSerie -> {
+			int id = tvSerie.getId();
+			String name = tvSerie.getOriginalName();
+			String overview = tvSerie.getOverview();
+			List<Person> createdBy = tvSerie.getCreatedBy();
+			String firstAirDate = tvSerie.getFirstAirDate();
+			List<String> originCountry = tvSerie.getOriginCountry();
+			TvSeries serie = tmdbApi.getTvSeries().getSeries(id, "en");
+			int numberOfEpisodes = serie.getNumberOfEpisodes();
+			int numberOfSeasons = serie.getNumberOfSeasons();
+		});
+	}
 
 	Float getRatingByAlbumId(Integer albumId) {
 		AtomicReference<Float> rating = new AtomicReference<>(0f);

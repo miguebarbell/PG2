@@ -4,12 +4,21 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class AlbumDaoSqlTest {
 
 	AlbumDaoSql dao = new AlbumDaoSql();
 
+	@Test
+	void searchByTitle() {
+		dao.searchByTitle("Mandalorian");
+		dao.searchByTitle("How I meet your mother");
+		dao.searchByTitle("Below Deck");
+	}
+	@Test
+	void api() {
+		dao.addByCode(60735);
+		assert dao.getAllAlbums().stream().anyMatch(album -> album.getAlbum().equals("The Flash"));
+	}
 	@Test
 	void getAlbumId() {
 		Album beef = dao.getAlbumId(1);
@@ -32,7 +41,7 @@ class AlbumDaoSqlTest {
 
 	@Test
 	void addAlbum() {
-
+		System.out.println("dao.addAlbum(new Album()) = " + dao.addAlbum(new Album("www")));
 	}
 
 	@Test
