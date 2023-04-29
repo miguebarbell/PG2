@@ -144,7 +144,7 @@ public class AlbumDaoSql implements AlbumDao {
 			TvSeries serie = tmdbApi.getTvSeries().getSeries(id, "en");
 			int numberOfEpisodes = serie.getNumberOfEpisodes();
 			int numberOfSeasons = serie.getNumberOfSeasons();
-			listOfResults.add(new TvSerieDTO(name, overview, firstAirDate, numberOfSeasons, numberOfEpisodes));
+			listOfResults.add(new TvSerieDTO(id,name, overview, firstAirDate, numberOfSeasons, numberOfEpisodes));
 		});
 		return listOfResults;
 	}
