@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import dao.UserDaoSql;
+import dao.UserTypes;
 import exceptions.LoginException;
 import exceptions.TrackingException;
 import populator.Populator;
@@ -17,13 +18,13 @@ import dao.ProgressDaoSql;
 import dao.User;
 
 public class Runner {
-	//fix static error, then get rid of this object
+	// fix static error, then get rid of this object
 	private static ConsoleColors c = new ConsoleColors();
 	private static Scanner scan = new Scanner(System.in);
-	
+
 	public static void main(String[] args) {
 
-		//comment this line out for persistent data
+		// comment this line out for persistent data
 		Populator.reset();
 
 		UserDaoSql userCaller = new UserDaoSql();
@@ -38,7 +39,7 @@ public class Runner {
 		do {
 			String ans = scan.nextLine().toUpperCase();
 			System.out.print(c.RESET);
-			 if (ans.isEmpty()) {
+			if (ans.isEmpty()) {
 				clear();
 				System.out.print(loginMenu);
 				continue;
@@ -54,13 +55,14 @@ public class Runner {
 					System.out.print(c.RESET + "password:" + c.YELLOW);
 					String password = scan.nextLine();
 					System.out.println(c.RESET);
-					
+
 					User loggedUser = new User(username, password);
 					User verifiedUser = userCaller.loginUser(loggedUser);
 					if (verifiedUser != null) {
 						// call menu function
 						clear();
-						System.out.println(c.GREEN + "You have successfully logged in " + verifiedUser.getUsername() + "!" + c.RESET);
+						System.out.println(c.GREEN + "You have successfully logged in " + verifiedUser.getUsername()
+								+ "!" + c.RESET);
 						try {
 							loggedMenu(verifiedUser);
 						} catch (TrackingException e) {
@@ -85,15 +87,14 @@ public class Runner {
 				break;
 			case 'R':
 			case '2':
-				System.out.println( c.YELLOW + 
-						"\nPlease try to use a unique username and a difficult password.\n" + c.RESET + 
-						"We store your password with MD5 message-digest algorithm, 128bit hash value.");
+				System.out.println(c.YELLOW + "\nPlease try to use a unique username and a difficult password.\n"
+						+ c.RESET + "We store your password with MD5 message-digest algorithm, 128bit hash value.");
 				System.out.println("\nusername:" + c.YELLOW);
 				String newUsername = scan.nextLine();
 				System.out.println(c.RESET + "\npassword:" + c.YELLOW);
 				String password = scan.nextLine();
 				System.out.print(c.RESET);
-				
+
 				boolean result = userCaller.createUser(newUsername, password);
 				if (result) {
 					System.out.println(c.GREEN + "\nUser " + newUsername + " created successfully." + c.RESET);
@@ -107,7 +108,8 @@ public class Runner {
 			case 'Q':
 			case '3':
 				isLogging = false;
-				System.out.println(c.GREEN_BOLD_BRIGHT + "Thanks for using our progress tracking app. Have a great day!" + c.RESET);
+				System.out.println(c.GREEN_BOLD_BRIGHT + "Thanks for using our progress tracking app. Have a great day!"
+						+ c.RESET);
 
 				break;
 
@@ -125,7 +127,7 @@ public class Runner {
 
 	private static void clear() {
 		StringBuilder sb = new StringBuilder();
-		for(int i = 0; i < 50; i++)
+		for (int i = 0; i < 50; i++)
 			sb.append("\n");
 		String banner = c.PURPLE + c.WHITE_BACKGROUND + "\r\n"
 				+ "  _________      __   _____ _                     _______             _             \r\n"
@@ -134,233 +136,264 @@ public class Runner {
 				+ "    | |    \\ \\/ /    \\___ \\| '_ \\ / _ \\ \\ /\\ / /    | | '__/ _` |/ __| |/ / _ \\ '__|\r\n"
 				+ "    | |     \\  /     ____) | | | | (_) \\ V  V /     | | | | (_| | (__|   <  __/ |   \r\n"
 				+ "    |_|      \\/     |_____/|_| |_|\\___/ \\_/\\_/      |_|_|  \\__,_|\\___|_|\\_\\___|_|   \r\n"
-				+ "                                                                                    \r\n"
-				+ c.RESET;
+				+ "                                                                                    \r\n" + c.RESET;
 		sb.append(banner);
-		
+
 		System.out.println(sb);
 	}
-	
-	public static void loggedMenu(User user) throws TrackingException {
 
-		AlbumDaoSql albumCaller = new AlbumDaoSql();
-		ProgressDaoSql progressCaller = new ProgressDaoSql();
-
+	public static void loggedMenu(User user) throws TrackingException {			
+		//2 separate menus for user and admin
+		//chooseOption() will remerge the two
+		
+		boolean doLoop = true;
 		int ans = 0;
 		do {
-			menu(user);
-
+			if(user.getUserType() == UserTypes.USER)
+				printUserMenu(user);
+			else
+				printAdminMenu(user);
+			
 			try {
 				ans = Integer.parseInt(scan.nextLine());
 			} catch (InputMismatchException e) {
 				System.out.println(c.RED + "Input must be a valid integer" + c.RESET);
 			}
 
-			List<Progress> progList = progressCaller.getAllUserTrackers(user.getUser_id());
-
-			switch (ans) {
-			case 1:
-				addAlbum(albumCaller);
-				break;
-
-			case 2:
-				// Add Progress
-				// Assumed that user already has an id
-				int userId = user.getUser_id();
-				System.out.println("What's the album id?");
-				System.out.println("----------------------------------------------------------------------------");
-
-				List<Album> albList = albumCaller.getAllAlbums();
-
-				System.out.println("\nID  -  Artist, 'Album'");
-				albList.forEach(album -> {
-					if (album.getAlbum_id() < 10)
-						System.out.printf(" %s  -  %s\n", album.getAlbum_id(), album.getAlbum());
-					else
-						System.out.printf("%s  -  %s\n", album.getAlbum_id(), album.getAlbum());
-				});
-
-				int albumId = scan.nextInt();
-
-				int choice;
-				String progressChoice;
-				String[] progressStatus = { "not completed", "in-progress", "completed", "" };
-
-
-
-				progressMenu();
-
-				choice = scan.nextInt();
-
-				String message = "Invalid progress entered";
-				boolean stillChoosing = true;
-				while (stillChoosing) {
-					switch (choice) {
-					case 6:
-						progressChoice = progressStatus[0];
-						Progress progressAdded = new Progress(userId, albumId, progressChoice);
-						boolean progressAddResult = progressCaller.addProgress(progressAdded);
-						if (progressAddResult) {
-							System.out.println(progressAdded);
-							System.out.println("Progress tracker successfully added");
-						} else {
-							System.out.println(message);
-							throw new TrackingException(message);
-						}
-						stillChoosing = false;
-						break;
-					case 7:
-						progressChoice = progressStatus[1];
-						Progress progressAdded2 = new Progress(userId, albumId, progressChoice);
-						boolean progressAddResult2 = progressCaller.addProgress(progressAdded2);
-						if (progressAddResult2) {
-							System.out.println(progressAdded2);
-							System.out.println("Progress tracker successfully added");
-						} else {
-							System.out.println(message);
-							throw new TrackingException(message);
-						}
-						stillChoosing = false;
-						break;
-					case 8:
-						progressChoice = progressStatus[2];
-						Progress progressAdded3 = new Progress(userId, albumId, progressChoice);
-						boolean progressAddResult3 = progressCaller.addProgress(progressAdded3);
-						if (progressAddResult3) {
-							System.out.println(progressAdded3);
-							System.out.println("Progress tracker successfully added");
-						} else {
-							System.out.println(message);
-							throw new TrackingException(message);
-						}
-						stillChoosing = false;
-						break;
-
-					case 0: break;
-					default:
-
-						stillChoosing = false;
-						throw new TrackingException(message);
-
-						//break;
-					}
+			if(user.getUserType() == UserTypes.USER) {
+				if(ans >= 1 && ans <= 4) { //valid
+					chooseOption(ans + 1, user);
 				}
-
-				break;
-
-			case 3:
-				// Update Progress
-				int userId2 = user.getUser_id();
-				System.out.println("What's the album id to update?");
-				System.out.println("----------------------------------------------------------------------------");
-
-				viewAlbums(progList);
-
-				System.out.println("\n");
-
-				int albumId2 = scan.nextInt();
-
-				int choice2;
-				String progressChoice2;
-				String[] progressStatus2 = { "not completed", "in-progress", "completed", "" };
-				progressUpdateMenu();
-
-
-
-				choice2 = scan.nextInt();
-
-				boolean stillChoosing2 = true;
-				while (stillChoosing2) {
-					switch (choice2) {
-					case 6:
-						progressChoice2 = progressStatus2[0];
-						Progress progressAdded = new Progress(userId2, albumId2, progressChoice2);
-						boolean progressAddResult = progressCaller.updateProgress(progressAdded);
-						if (progressAddResult) {
-							System.out.println(progressAdded);
-							System.out.println("Progress tracker successfully updated");
-						} else {
-							System.out.println("Could not update progress tracker");
-							throw new TrackingException();
-						}
-						stillChoosing2 = false;
-						break;
-					case 7:
-						progressChoice2 = progressStatus2[1];
-						Progress progressAdded2 = new Progress(userId2, albumId2, progressChoice2);
-						boolean progressAddResult2 = progressCaller.updateProgress(progressAdded2);
-						if (progressAddResult2) {
-							System.out.println(progressAdded2);
-							System.out.println("Progress tracker successfully updated");
-						} else {
-							System.out.println("Could not update progress tracker");
-							throw new TrackingException();
-						}
-						stillChoosing2 = false;
-						break;
-					case 8:
-						progressChoice2 = progressStatus2[2];
-						Progress progressAdded3 = new Progress(userId2, albumId2, progressChoice2);
-						boolean progressAddResult3 = progressCaller.updateProgress(progressAdded3);
-						if (progressAddResult3) {
-							System.out.println(progressAdded3);
-							System.out.println("Progress tracker successfully updated");
-						} else {
-							System.out.println("Could not update progress tracker");
-							throw new TrackingException();
-						}
-						stillChoosing2 = false;
-						break;
-
-					default:
-						System.out.println("Incorrect input");
-						System.out.println("What's the status of the album to update?" + "\n"
-								+ "Please enter 6 for not completed " + " 7 for in-progress or 8 for completed");
-						stillChoosing2 = false;
-						break;
-					}
-				}
-
-				break;
-
-			case 4:
-				// View Albums and their trackers
-				System.out.println("Your progress trackers and albums");
-				System.out.println("----------------------------------------------------------------------------");
-
-				viewAlbums(progList);
-
-				System.out.println("\n");
-
-				break;
-
-			case 5:
-				System.out.println("You have logged out\n");
-				break;
-
-			default:
-				System.out.println("Invalid input, try again!\n");
-				scan.nextLine();
+				if(ans == 4) doLoop = false; //log out
 			}
-		} while (ans != 5);
+			else {
+				if(ans >= 1 && ans <= 5) { //valid
+					chooseOption(ans, user);
+				}
+				if(ans == 5) doLoop = false; //log out
+			}
+			
+		} while(doLoop);
+			
 	}
 
-	public static void menu(User user) {
+	public static void chooseOption(int ans, User user) throws TrackingException {
+		AlbumDaoSql albumCaller = new AlbumDaoSql();	
+		ProgressDaoSql progressCaller = new ProgressDaoSql();
+		List<Progress> progList = progressCaller.getAllUserTrackers(user.getUser_id());
+		
+		switch (ans) {
+		case 0: break;
+		case 1:
+			addAlbum(albumCaller);
+			break;
 
-		System.out.println("\n==============================================");
-		System.out.println("  Hello, " + user.getUsername());
-		System.out.println("| Welcome to the Album Progress Tracker!     |");
-		System.out.println("|                                            |");
-		System.out.println("| Please choose from the following options:  |");
-		System.out.println("|                                            |");
-		System.out.println("| 1: Add Album                               |");
-		System.out.println("| 2: Add Progress                            |");
-		System.out.println("| 3: Update Progress                         |");
-		System.out.println("| 4: List Albums                             |");
-		System.out.println("| 5: LOGOUT                                  |");
-		System.out.println("|                                            |");
-		System.out.println("==============================================");
+		case 2:
+			// Add Progress
+			// Assumed that user already has an id
+			int userId = user.getUser_id();
+			System.out.println("What's the album id?");
+			System.out.println("----------------------------------------------------------------------------");
+
+			List<Album> albList = albumCaller.getAllAlbums();
+
+			System.out.println("\nID  -  Artist, 'Album'");
+			albList.forEach(album -> {
+				if (album.getAlbum_id() < 10)
+					System.out.printf(" %s  -  %s\n", album.getAlbum_id(), album.getAlbum());
+				else
+					System.out.printf("%s  -  %s\n", album.getAlbum_id(), album.getAlbum());
+			});
+
+			int albumId = scan.nextInt();
+
+			int choice;
+			String progressChoice;
+			String[] progressStatus = { "not completed", "in-progress", "completed", "" };
+
+
+
+			progressMenu();
+
+			choice = scan.nextInt();
+
+			String message = "Invalid progress entered";
+			boolean stillChoosing = true;
+			while (stillChoosing) {
+				switch (choice) {
+				case 6:
+					progressChoice = progressStatus[0];
+					Progress progressAdded = new Progress(userId, albumId, progressChoice);
+					boolean progressAddResult = progressCaller.addProgress(progressAdded);
+					if (progressAddResult) {
+						System.out.println(progressAdded);
+						System.out.println("Progress tracker successfully added");
+					} else {
+						System.out.println(message);
+						throw new TrackingException(message);
+					}
+					stillChoosing = false;
+					break;
+				case 7:
+					progressChoice = progressStatus[1];
+					Progress progressAdded2 = new Progress(userId, albumId, progressChoice);
+					boolean progressAddResult2 = progressCaller.addProgress(progressAdded2);
+					if (progressAddResult2) {
+						System.out.println(progressAdded2);
+						System.out.println("Progress tracker successfully added");
+					} else {
+						System.out.println(message);
+						throw new TrackingException(message);
+					}
+					stillChoosing = false;
+					break;
+				case 8:
+					progressChoice = progressStatus[2];
+					Progress progressAdded3 = new Progress(userId, albumId, progressChoice);
+					boolean progressAddResult3 = progressCaller.addProgress(progressAdded3);
+					if (progressAddResult3) {
+						System.out.println(progressAdded3);
+						System.out.println("Progress tracker successfully added");
+					} else {
+						System.out.println(message);
+						throw new TrackingException(message);
+					}
+					stillChoosing = false;
+					break;
+
+				case 0: break;
+				default:
+
+					stillChoosing = false;
+					throw new TrackingException(message);
+
+					//break;
+				}
+			}
+
+			break;
+
+		case 3:
+			// Update Progress
+			int userId2 = user.getUser_id();
+			System.out.println("What's the album id to update?");
+			System.out.println("----------------------------------------------------------------------------");
+
+			viewAlbums(progList);
+
+			System.out.println("\n");
+
+			int albumId2 = scan.nextInt();
+
+			int choice2;
+			String progressChoice2;
+			String[] progressStatus2 = { "not completed", "in-progress", "completed", "" };
+			progressUpdateMenu();
+
+
+
+			choice2 = scan.nextInt();
+
+			boolean stillChoosing2 = true;
+			while (stillChoosing2) {
+				switch (choice2) {
+				case 6:
+					progressChoice2 = progressStatus2[0];
+					Progress progressAdded = new Progress(userId2, albumId2, progressChoice2);
+					boolean progressAddResult = progressCaller.updateProgress(progressAdded);
+					if (progressAddResult) {
+						System.out.println(progressAdded);
+						System.out.println("Progress tracker successfully updated");
+					} else {
+						System.out.println("Could not update progress tracker");
+						throw new TrackingException();
+					}
+					stillChoosing2 = false;
+					break;
+				case 7:
+					progressChoice2 = progressStatus2[1];
+					Progress progressAdded2 = new Progress(userId2, albumId2, progressChoice2);
+					boolean progressAddResult2 = progressCaller.updateProgress(progressAdded2);
+					if (progressAddResult2) {
+						System.out.println(progressAdded2);
+						System.out.println("Progress tracker successfully updated");
+					} else {
+						System.out.println("Could not update progress tracker");
+						throw new TrackingException();
+					}
+					stillChoosing2 = false;
+					break;
+				case 8:
+					progressChoice2 = progressStatus2[2];
+					Progress progressAdded3 = new Progress(userId2, albumId2, progressChoice2);
+					boolean progressAddResult3 = progressCaller.updateProgress(progressAdded3);
+					if (progressAddResult3) {
+						System.out.println(progressAdded3);
+						System.out.println("Progress tracker successfully updated");
+					} else {
+						System.out.println("Could not update progress tracker");
+						throw new TrackingException();
+					}
+					stillChoosing2 = false;
+					break;
+
+				default:
+					System.out.println("Incorrect input");
+					System.out.println("What's the status of the album to update?" + "\n"
+							+ "Please enter 6 for not completed " + " 7 for in-progress or 8 for completed");
+					stillChoosing2 = false;
+					break;
+				}
+			}
+
+			break;
+
+		case 4:
+			// View Albums and their trackers
+			System.out.println("Your progress trackers and albums");
+			System.out.println("----------------------------------------------------------------------------");
+
+			viewAlbums(progList);
+
+			System.out.println("\n");
+
+			break;
+
+		case 5:
+			System.out.println("You have logged out\n");
+			break;
+
+		default:
+			System.out.println("Invalid input, try again!\n");
+			scan.nextLine();
+		}
 	}
+		
+	public static void printUserMenu(User user) {
+		clear();
+		
+		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);		
+		System.out.println("1: Add Progress");
+		System.out.println("2: Update Progress");
+		System.out.println("3: List Albums");
+		System.out.println("4: Logout");
+		System.out.print("Please choose an option (1-4):");
+	}
+	
+	public static void printAdminMenu(User user) {
+		clear();
+		
+		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);
+		System.out.println("You are logged in as an " + c.WHITE_UNDERLINED + "admin." + c.RESET);
+		System.out.println(c.WHITE_BOLD + "1: Add Album" + c.RESET);
+		System.out.println("2: Add Progress");
+		System.out.println("3: Update Progress");
+		System.out.println("4: List Albums");
+		System.out.println("5: Logout");
+		System.out.print("Please choose an option (1-5):");
+	}
+	
+	
 	public static void progressMenu() {
 
 		System.out.println("Please choose your progress:			  ");
