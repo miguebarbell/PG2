@@ -12,13 +12,13 @@ import connection.ConnectionManager;
 
 public class ProgressDaoSql implements ProgressDao {
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public List<Progress> getAllUserTrackers(int u_id) {
 
 
-     List<Progress> progList = new ArrayList<Progress>();
+     List<Progress> progList = new ArrayList<>();
 
 		try( Statement stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery("SELECT * FROM progress where user_id = " + u_id)){
@@ -46,7 +46,8 @@ public class ProgressDaoSql implements ProgressDao {
 	@Override
 	public boolean updateProgress(Progress progress) {
 
-		try ( PreparedStatement pstmt = conn.prepareStatement("update progress set user_id = ?, album_id = ?, progress = ? where album_id = ?")) {
+		try ( PreparedStatement pstmt = conn.prepareStatement(
+				"update progress set user_id = ?, track_id = ?, progress = ? where track_id = ?")) {
 
 			pstmt.setInt(1, progress.getUser_id());
 			pstmt.setInt(2, progress.getTrack_id());

@@ -112,7 +112,44 @@ public class Populator {
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,7,'Here Comes a Candle to Light You " +
 			                  "to Bed')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,8,'The Instant White-Hot Wild')");
+			// track some episodes with progress
+			// user_id 1
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 1, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 2, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 3, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 4, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 5, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 6, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 7, 'completed')");
 
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 19, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 20, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 21, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 22, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 23, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 24, 'completed')");
+			// user_id 2
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 1, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 2, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 3, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 4, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 5, 'completed')");
+			// give some ratings
+			// user_id 1
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 1, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 2, 4)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 3, 3)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 4, 3)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 5, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 6, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 7, 4)");
+			// user_id 2
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 1, 3)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 2, 2)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 3, 3)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 4, 3)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 5, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 6, 0)");
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}

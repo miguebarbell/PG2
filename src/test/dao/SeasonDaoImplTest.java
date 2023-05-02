@@ -41,6 +41,23 @@ class SeasonDaoImplTest {
 	}
 
 	@Test
+	@DisplayName("Get the progress for a season")
+	void testGetProgressForSeason() {
+		Float user1season1 = dao.getProgressByUserIdAndSeasonId(1, 1);
+		System.out.println(user1season1);
+		assert user1season1 == 0.7f;
+		Float user2season1 = dao.getProgressByUserIdAndSeasonId(2, 1);
+		System.out.println(user2season1);
+		assert user2season1 == 0.5f;
+		Float user2season2 = dao.getProgressByUserIdAndSeasonId(2, 2);
+		System.out.println(user2season2);
+		assert user2season2 == null;
+		Float user1season3 = dao.getProgressByUserIdAndSeasonId(1, 3);
+		System.out.println(user1season3);
+		assert user1season3 == 0.75f;
+	}
+
+	@Test
 	@Order(2)
 	@DisplayName("Retrieve the new seasons from BEEF")
 	void getSeasonsByTvshowId() {
