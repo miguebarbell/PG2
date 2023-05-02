@@ -3,14 +3,13 @@ package dao;
 import connection.ConnectionManager;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AlbumDaoSql implements AlbumDao {
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public Album getAlbumId(int a_id) {
@@ -86,6 +85,35 @@ public class AlbumDaoSql implements AlbumDao {
 		return false;
 	}
 
+	List<AlbumRankingDTO> getRecomendations(Integer userId, Integer numberOfSuggestions) {
+//		String getMoviesAlreadyRated = """
+//				SELECT * FROM albums WHERE album_id IN
+//				    (SELECT album_id FROM seasons WHERE season_id IN
+//				    (SELECT season_id FROM tracks
+//				    INNER JOIN ratings r on tracks.track_id = r.track_id AND r.user_id = ?))
+//								""";
+		String sqlTvShowsAlreadyRatedAndTheRated = """
+				SELECT album, AVG(rating) as rating
+				FROM ratings
+				         INNER JOIN tracks t ON ratings.track_id = t.track_id AND ratings.user_id = ?
+				         INNER JOIN seasons s ON t.season_id = s.season_id
+				         INNER JOIN albums a on s.album_id = a.album_id
+				GROUP BY album;
+								""";
+		List<AlbumRankingDTO> showsRated = new ArrayList<>();
+		try (PreparedStatement gmarStmt = conn.prepareStatement(sqlTvShowsAlreadyRatedAndTheRated)) {
+			gmarStmt.setInt(1, userId);
+			ResultSet resultSet = gmarStmt.executeQuery();
+			while (resultSet.next()) {
+				showsRated.add(new AlbumRankingDTO(resultSet.getString(1), resultSet.getFloat(2), null));
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return OpenAI.getRecommendations(showsRated, numberOfSuggestions);
+	}
+
+
 	Float getRatingByAlbumId(Integer albumId) {
 		AtomicReference<Float> rating = new AtomicReference<>(0f);
 		AtomicInteger count = new AtomicInteger();
@@ -98,6 +126,6 @@ public class AlbumDaoSql implements AlbumDao {
 				count.getAndIncrement();
 			}
 		});
-		return count.get() > 0 ? rating.get()/count.get() : null;
+		return count.get() > 0 ? rating.get() / count.get() : null;
 	}
 }

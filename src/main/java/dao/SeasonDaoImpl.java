@@ -8,14 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.OptionalDouble;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SeasonDaoImpl implements SeasonDao {
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public boolean save(Season season) {
@@ -59,7 +57,7 @@ public class SeasonDaoImpl implements SeasonDao {
 		AtomicInteger count = new AtomicInteger(0);
 		TrackDaoImpl trackDao = new TrackDaoImpl();
 		List<Track> episodesBySeasonId = getEpisodesBySeasonId(seasonId);
-		episodesBySeasonId.stream().forEach(episode -> {
+		episodesBySeasonId.forEach(episode -> {
 					Float ratingByTrackId = trackDao.getRatingByTrackId(episode.getId());
 					if (ratingByTrackId != null) {
 						count.incrementAndGet();

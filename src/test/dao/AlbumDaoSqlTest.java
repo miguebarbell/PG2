@@ -4,8 +4,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class AlbumDaoSqlTest {
 
 	AlbumDaoSql dao = new AlbumDaoSql();
@@ -40,5 +38,13 @@ class AlbumDaoSqlTest {
 		System.out.println(dao.getRatingByAlbumId(1));
 		System.out.println(dao.getRatingByAlbumId(2));
 		System.out.println(dao.getRatingByAlbumId(3));
+	}
+	@Test
+	void recommendations() {
+		List<AlbumRankingDTO> recommendations = dao.getRecomendations(1, 5);
+		recommendations.forEach(recomendation -> {
+			System.out.printf("%s. %s%n", recomendation.recommendation(), recomendation.title());
+		});
+		assert recommendations.get(0).recommendation().equals(1);
 	}
 }
