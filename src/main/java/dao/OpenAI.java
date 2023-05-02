@@ -10,11 +10,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class OpenAI {
-	public static List<AlbumRankingDTO> getRecommendations(List<AlbumRankingDTO> tvShowsAndRatings,
-	                                                       Integer numberOfSuggestions) {
+	public static List<AlbumDTO> getRecommendations(List<AlbumDTO> tvShowsAndRatings,
+	                                                Integer numberOfSuggestions) {
 		final String KEY = System.getenv("OPENAI_API_KEY");
 		final String CHAT_URL = "https://api.openai.com/v1/chat/completions";
-		ArrayList<AlbumRankingDTO> recommendations = new ArrayList<>();
+		ArrayList<AlbumDTO> recommendations = new ArrayList<>();
 		String prompt = """
 				Recommend me %s shows based in this evaluation:
 				%sand just give me an enumerated list of titles of the show without description of your recommendations
@@ -47,11 +47,11 @@ public class OpenAI {
 			Arrays.stream(recomendations.split("\\\\n"))
 			      .forEach(recommendation -> {
 				      String trimmed = recommendation.replace("\"", "").trim();
-				      AlbumRankingDTO albumRankingDTO = new AlbumRankingDTO(
+				      AlbumDTO albumDTO = new AlbumDTO(
 						      trimmed.split("\\.")[1],
 						      null,
-						      Integer.parseInt(trimmed.split("\\.")[0]));
-							recommendations.add(albumRankingDTO);
+						      Integer.parseInt(trimmed.split("\\.")[0]), null);
+							recommendations.add(albumDTO);
 			      });
 		} catch (Exception e) {
 			System.out.println("Error");

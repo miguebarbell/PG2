@@ -85,7 +85,42 @@ public class AlbumDaoSql implements AlbumDao {
 		return false;
 	}
 
-	List<AlbumRankingDTO> getRecomendations(Integer userId, Integer numberOfSuggestions) {
+
+	@Override
+	public Float getProgressByUserIdAndAlbumId(int userId, int albumId) {
+		String sql = """
+				SELECT album_id, SUM(total) as completed, SUM(number) as total, SUM(total) / SUM(number) as percentage
+				FROM seasons
+				INNER JOIN
+				(SELECT season_id, COUNT(number) AS number, COUNT(q1.track_id) as total
+				FROM tracks t
+				LEFT JOIN
+				(SELECT track_id
+				from progress
+				where user_id = ?
+				and progress = 'completed') q1
+				on q1.track_id = t.track_id
+				GROUP BY season_id) j1
+				ON seasons.season_id = j1.season_id
+				WHERE album_id = ?
+				GROUP BY album_id;
+						""";
+		try (PreparedStatement statement = conn.prepareStatement(sql)) {
+
+			statement.setInt(1, userId);
+			statement.setInt(2, albumId);
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				return resultSet.getFloat(4);
+
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return null;
+	}
+
+	List<AlbumDTO> getRecommendations(Integer userId, Integer numberOfSuggestions) {
 //		String getMoviesAlreadyRated = """
 //				SELECT * FROM albums WHERE album_id IN
 //				    (SELECT album_id FROM seasons WHERE season_id IN
@@ -100,12 +135,12 @@ public class AlbumDaoSql implements AlbumDao {
 				         INNER JOIN albums a on s.album_id = a.album_id
 				GROUP BY album;
 								""";
-		List<AlbumRankingDTO> showsRated = new ArrayList<>();
+		List<AlbumDTO> showsRated = new ArrayList<>();
 		try (PreparedStatement gmarStmt = conn.prepareStatement(sqlTvShowsAlreadyRatedAndTheRated)) {
 			gmarStmt.setInt(1, userId);
 			ResultSet resultSet = gmarStmt.executeQuery();
 			while (resultSet.next()) {
-				showsRated.add(new AlbumRankingDTO(resultSet.getString(1), resultSet.getFloat(2), null));
+				showsRated.add(new AlbumDTO(resultSet.getString(1), resultSet.getFloat(2), null, null));
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -128,4 +163,43 @@ public class AlbumDaoSql implements AlbumDao {
 		});
 		return count.get() > 0 ? rating.get() / count.get() : null;
 	}
+
+	List<AlbumDTO> getProgressByUserId(int userId) {
+		List<AlbumDTO> result = new ArrayList<>();
+		String sql = """
+SELECT album, percentage
+FROM albums
+         INNER JOIN
+     (SELECT album_id, SUM(total) as completed, SUM(number) as total, SUM(total) / SUM(number) as percentage
+      FROM seasons
+               INNER JOIN
+           (SELECT season_id, COUNT(number) AS number, COUNT(q1.track_id) as total
+            FROM tracks t
+                     LEFT JOIN
+                 (SELECT track_id
+                  from progress
+                  where user_id = ?
+                    and progress = 'completed') q1
+                 on q1.track_id = t.track_id
+            GROUP BY season_id) j1
+           ON seasons.season_id = j1.season_id
+      GROUP BY album_id) j2
+     ON j2.album_id = albums.album_id
+								""";
+		try (PreparedStatement statement = conn.prepareStatement(sql)) {
+			statement.setInt(1, userId);
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				result.add(new AlbumDTO(
+						resultSet.getString(1),
+						null, null,
+						resultSet.getFloat(2)
+				));
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+
 }
