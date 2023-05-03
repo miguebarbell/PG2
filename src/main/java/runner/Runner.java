@@ -181,8 +181,7 @@ public class Runner {
 
 	public static void chooseOption(int ans, User user) throws TrackingException {
 		AlbumDaoSql albumCaller = new AlbumDaoSql();	
-		ProgressDaoSql progressCaller = new ProgressDaoSql();
-		List<Progress> progList = progressCaller.getAllUserTrackers(user.getUser_id());
+		ProgressDaoSql progressCaller = new ProgressDaoSql();		
 		clear();
 		
 		switch (ans) {
@@ -293,10 +292,10 @@ public class Runner {
 
 		case 3:
 			// Update Progress
+			List<Progress> progList = progressCaller.getAllUserTrackers(user.getUser_id());
 			int userId2 = user.getUser_id();
-			System.out.println("What's the album id to update?");
-			System.out.println("----------------------------------------------------------------------------");
 
+			System.out.println(c.CYAN + "ADD PROGRESS" + c.RESET);
 			viewAlbums(progList);
 
 			System.out.println("\n");
@@ -321,9 +320,9 @@ public class Runner {
 					boolean progressAddResult = progressCaller.updateProgress(progressAdded);
 					if (progressAddResult) {
 						System.out.println(progressAdded);
-						System.out.println("Progress tracker successfully updated");
+						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
 					} else {
-						System.out.println("Could not update progress tracker");
+						System.out.println(c.RED + "Could not update progress tracker" + c.RESET);
 						throw new TrackingException();
 					}
 					stillChoosing2 = false;
@@ -334,9 +333,9 @@ public class Runner {
 					boolean progressAddResult2 = progressCaller.updateProgress(progressAdded2);
 					if (progressAddResult2) {
 						System.out.println(progressAdded2);
-						System.out.println("Progress tracker successfully updated");
+						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
 					} else {
-						System.out.println("Could not update progress tracker");
+						System.out.println(c.RED + "Could not update progress tracker" + c.RESET);
 						throw new TrackingException();
 					}
 					stillChoosing2 = false;
@@ -347,9 +346,9 @@ public class Runner {
 					boolean progressAddResult3 = progressCaller.updateProgress(progressAdded3);
 					if (progressAddResult3) {
 						System.out.println(progressAdded3);
-						System.out.println("Progress tracker successfully updated");
+						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
 					} else {
-						System.out.println("Could not update progress tracker");
+						System.out.println(c.RED + "Could not update progress tracker" + c.RESET);
 						throw new TrackingException();
 					}
 					stillChoosing2 = false;
@@ -367,11 +366,12 @@ public class Runner {
 			break;
 
 		case 4:
+			List<Progress> progList2 = progressCaller.getAllUserTrackers(user.getUser_id());
 			// View Albums and their trackers
 			System.out.println("Your progress trackers and albums");
 			System.out.println("----------------------------------------------------------------------------");
 
-			viewAlbums(progList);
+			viewAlbums(progList2);
 
 			System.out.println("\n");
 
@@ -447,18 +447,22 @@ public class Runner {
 		AlbumDaoSql albumCaller = new AlbumDaoSql();
 		if (null == progList || progList.isEmpty()) {
 			System.out.println("\nYou aren't tracking any albums.\n");
+			return;
 		}
 		List<Album> albums = albumCaller.getAllAlbums();
 		progList.forEach(progress -> {
 
 			Album progressAlbum =
 					albums.stream().filter(album -> album.getAlbum_id() == progress.getTrack_id())
-					      .findFirst().get();
+					      .findFirst().orElse(null);
+			
+			if(progressAlbum == null) return;
+			
 			if (progressAlbum.getAlbum_id() < 10)	System.out.printf("\n %s - %s -> %s", progressAlbum.getAlbum_id(),
 					progressAlbum.getAlbum(), progress.getProgress());
 			else System.out.printf("\n%s - %s -> %s", progressAlbum.getAlbum_id(),
 					progressAlbum.getAlbum(), progress.getProgress());
-			System.out.println("\nprogressAlbum.getRating() = " + progressAlbum.getRating());
+			System.out.println("\nRating = " + progressAlbum.getRating());
 		});
 	}
 
