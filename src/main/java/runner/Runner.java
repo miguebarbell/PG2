@@ -375,6 +375,7 @@ public class Runner {
 
 			System.out.println("\n");
 
+			scan.nextLine();
 			break;
 
 		case 5:			
@@ -383,7 +384,6 @@ public class Runner {
 
 		default:
 			System.out.println("Invalid input, try again!\n");
-			scan.nextLine();
 		}
 	}
 		
