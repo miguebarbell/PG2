@@ -2,9 +2,9 @@ package dao;
 
 public class Track {
 	private Integer id;
-	private String title;
-	private Integer number;
-	private Integer seasonID;
+	private final String title;
+	private final Integer number;
+	private final Integer seasonID;
 
 	public Track(Integer id, String title, Integer number, Integer seasonID) {
 		this.id = id;

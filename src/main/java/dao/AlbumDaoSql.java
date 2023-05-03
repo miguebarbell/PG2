@@ -1,14 +1,27 @@
 package dao;
 
 import connection.ConnectionManager;
+import info.movito.themoviedbapi.*;
+import info.movito.themoviedbapi.model.people.Person;
+import info.movito.themoviedbapi.model.tv.TvEpisode;
+import info.movito.themoviedbapi.model.tv.TvSeason;
+import info.movito.themoviedbapi.model.tv.TvSeries;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+
 public class AlbumDaoSql implements AlbumDao {
 
+	private final Connection conn = ConnectionManager.getConnection();
+	Properties props = new Properties();
 	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
@@ -25,9 +38,7 @@ public class AlbumDaoSql implements AlbumDao {
 				int album_id = rs.getInt("album_id");
 				String album_name = rs.getString("album");
 
-
 				album = new Album(album_id, album_name);
-
 
 			}
 
@@ -67,22 +78,77 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 	@Override
-	public boolean addAlbum(Album album) {
+	public Integer addAlbum(Album album) {
 
-		try (PreparedStatement pstmt = conn.prepareStatement("INSERT into albums(album)values(?)")) {
+		try (PreparedStatement pstmt = conn.prepareStatement("INSERT into albums(album)values(?)", Statement.RETURN_GENERATED_KEYS)) {
 
 			pstmt.setString(1, album.getAlbum());
 
 			int count = pstmt.executeUpdate();
-
-			if (count > 0) {
-				return true;
-			}
+			ResultSet generatedKeys = pstmt.getGeneratedKeys();
+			if (generatedKeys.next()) return generatedKeys.getInt(1);
 		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("album add failed");
+			System.out.println("TV SHOW: '%s' is already in the database".formatted(album.getAlbum()));
 		}
-		return false;
+		return 0;
+	}
+
+	@Override
+	public boolean addByCode(Integer code) {
+		SeasonDaoImpl seasonDao = new SeasonDaoImpl();
+		TrackDaoImpl trackDao = new TrackDaoImpl();
+		try {
+			props.load(new FileInputStream("resources/config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String key = props.getProperty("key");
+		String url = "https://api.themoviedb.org/3/tv/%s?api_key=%s".formatted(code, key);
+		TmdbApi tmdbApi = new TmdbApi(key);
+		TvSeries newSerie = tmdbApi.getTvSeries().getSeries(code, "en");
+		String name = newSerie.getOriginalName();
+//		String description = newSerie.getOverview();
+		List<TvSeason> seasons = newSerie.getSeasons();
+			Integer newAlbumId = addAlbum(new Album(name));
+			seasons.forEach(season -> {
+//			String seasonOverview = season.getOverview();
+				String seasonName = season.getName();
+				int seasonNumber = season.getSeasonNumber();
+				Integer newSeasonId = seasonDao.save(new Season(seasonName, newAlbumId));
+				TvSeason result = tmdbApi.getTvSeasons().getSeason(code, seasonNumber, "en", TmdbTvSeasons.SeasonMethod.values());
+				List<TvEpisode> episodes = result.getEpisodes();
+				episodes.forEach(episode -> {
+					int episodeNumber = episode.getEpisodeNumber();
+					String episodeName = episode.getName();
+					trackDao.save(new Track(episodeName, episodeNumber, newSeasonId));
+				});
+			});
+			return true;
+	}
+
+	@Override
+	public List<TvSerieDTO> searchByTitle(String title) {
+		try {
+			props.load(new FileInputStream("resources/config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		List<TvSerieDTO> listOfResults = new ArrayList<>();
+		TmdbApi tmdbApi = new TmdbApi(props.getProperty("key"));
+		List<TvSeries> results = tmdbApi.getSearch().searchTv(title, "en", 1).getResults();
+		results.forEach(tvSerie -> {
+			int id = tvSerie.getId();
+			String name = tvSerie.getOriginalName();
+			String overview = tvSerie.getOverview();
+//			List<Person> createdBy = tvSerie.getCreatedBy();
+			String firstAirDate = tvSerie.getFirstAirDate();
+//			List<String> originCountry = tvSerie.getOriginCountry();
+			TvSeries serie = tmdbApi.getTvSeries().getSeries(id, "en");
+			int numberOfEpisodes = serie.getNumberOfEpisodes();
+			int numberOfSeasons = serie.getNumberOfSeasons();
+			listOfResults.add(new TvSerieDTO(id,name, overview, firstAirDate, numberOfSeasons, numberOfEpisodes));
+		});
+		return listOfResults;
 	}
 
 

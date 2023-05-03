@@ -1,28 +1,27 @@
 package dao;
 
+import connection.ConnectionManager;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import connection.ConnectionManager;
-import encoder.HasherImpl;
+public class UserDaoSql implements UserDao{
 
-public class UserDaoSql implements UserDao {
-
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public User getUsername(String username) {
 
-		try (PreparedStatement pstmt = conn.prepareStatement("select * from users where username = ?")) {
+		try( PreparedStatement pstmt = conn.prepareStatement("select * from users where username = ?")){
 
 			pstmt.setString(2, username);
 
 			ResultSet rs = pstmt.executeQuery();
 			User user = null;
 
-			if (rs.next()) {
+			if(rs.next()) {
 				int user_id = rs.getInt("user_id");
 				String usname = rs.getString("username");
 				String password = rs.getString("password");
@@ -124,5 +123,9 @@ public class UserDaoSql implements UserDao {
 
 		return null;
 	}
+
+
+
+
 
 }

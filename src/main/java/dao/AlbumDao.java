@@ -8,6 +8,8 @@ public interface AlbumDao {
 
 	List<Album> getAllAlbums();
 
-	boolean addAlbum(Album album);
-	Float getProgressByUserIdAndAlbumId(int userId, int albumId);
+	Integer addAlbum(Album album);
+
+	boolean addByCode(Integer code);
+	List<TvSerieDTO> searchByTitle(String title);
 }

@@ -37,7 +37,7 @@ class TrackDaoImplTest {
 	@Test
 	void save() {
 		Track track = new Track("This is a new Episode in BEEF Season 1", 11, 1);
-		boolean save = dao.save(track);
-		assertTrue(save);
+		int save = dao.save(track);
+		assertTrue(save != 0);
 	}
 }

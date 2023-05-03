@@ -2,10 +2,7 @@ package dao;
 
 import connection.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class TrackDaoImpl implements TrackDao {
 
@@ -60,19 +57,17 @@ public class TrackDaoImpl implements TrackDao {
 	}
 
 	@Override
-	public boolean save(Track track) {
+	public Integer save(Track track) {
 		String sql = "INSERT INTO tracks(season_id, number, title) values (?,?,?)";
-		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+		try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 			ps.setInt(1, track.getSeasonID());
 			ps.setInt(2, track.getNumber());
 			ps.setString(3, track.getTitle());
 			int rows = ps.executeUpdate();
-			if (rows > 0) {
-				return true;
-			}
+			ResultSet generatedKeys = ps.getGeneratedKeys();
+			return generatedKeys.next() ? generatedKeys.getInt(1) : 0;
 		} catch (SQLException e) {
-			return false;
+			return 0;
 		}
-		return false;
 	}
 }

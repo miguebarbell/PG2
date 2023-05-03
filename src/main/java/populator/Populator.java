@@ -25,7 +25,7 @@ public class Populator {
 
 			statement.execute("CREATE TABLE albums (" +
 			                  "album_id INT auto_increment PRIMARY KEY," +
-			                  "album varchar(255));");
+			                  "album varchar(255) UNIQUE);");
 
 
 			statement.execute("CREATE TABLE seasons(" +
