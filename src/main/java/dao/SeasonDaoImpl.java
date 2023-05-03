@@ -8,14 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.OptionalDouble;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SeasonDaoImpl implements SeasonDao {
 
-	private Connection conn = ConnectionManager.getConnection();
+	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public boolean save(Season season) {
@@ -59,7 +57,7 @@ public class SeasonDaoImpl implements SeasonDao {
 		AtomicInteger count = new AtomicInteger(0);
 		TrackDaoImpl trackDao = new TrackDaoImpl();
 		List<Track> episodesBySeasonId = getEpisodesBySeasonId(seasonId);
-		episodesBySeasonId.stream().forEach(episode -> {
+		episodesBySeasonId.forEach(episode -> {
 					Float ratingByTrackId = trackDao.getRatingByTrackId(episode.getId());
 					if (ratingByTrackId != null) {
 						count.incrementAndGet();
@@ -88,5 +86,36 @@ public class SeasonDaoImpl implements SeasonDao {
 			throw new RuntimeException(e);
 		}
 		return seasons;
+	}
+
+	@Override
+	public Float getProgressByUserIdAndSeasonId(int userId, int seasonId) {
+		String sql = """
+				SELECT q1.season_id as season_id, progress as number, total, progress/total as percentage
+				FROM (SELECT season_id, COUNT(number) AS progress
+							FROM tracks
+							WHERE track_id IN
+										(SELECT track_id from progress where user_id = ? and progress = 'completed')
+							GROUP BY season_id) q1
+								 INNER JOIN (
+						(SELECT season_id, COUNT(number) as total
+						 FROM tracks
+						 GROUP BY season_id) q2)
+														ON q1.season_id = q2.season_id
+														
+				WHERE q1.season_id = ?;
+												""";
+		try (PreparedStatement statement = conn.prepareStatement(sql)) {
+			statement.setInt(1, userId);
+			statement.setInt(2,seasonId);
+			ResultSet resultSet = statement.executeQuery();
+			if (resultSet.next()) {
+				return resultSet.getFloat(4);
+			}
+
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return null;
 	}
 }

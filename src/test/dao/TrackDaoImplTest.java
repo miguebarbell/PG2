@@ -20,11 +20,17 @@ class TrackDaoImplTest {
 	@Order(1)
 	@DisplayName("Adding rating of GOOD to episode id 1")
 	void addRating() {
-		boolean ratingBolean = dao.addRating(RatingType.GOOD, 1, 1);
-		boolean ratingBolean2
+		boolean ratingForId1= dao.addRating(RatingType.GOOD, 1, 1);
+		boolean ratingForId29 = dao.addRating(RatingType.BAD, 29, 1);
+		boolean ratingForId30 = dao.addRating(RatingType.GOOD, 30, 1);
+		boolean ratingForId31 = dao.addRating(RatingType.REALLY_BAD, 31, 1);
+		boolean ratingForId1User2
 				= dao.addRating(RatingType.BAD, 1, 2);
-		assertTrue(ratingBolean);
-		assertTrue(ratingBolean2);
+		assertTrue(ratingForId30);
+		assertTrue(ratingForId1User2);
+		assertTrue(ratingForId1);
+		assertTrue(ratingForId29);
+		assertTrue(ratingForId31);
 
 	}
 

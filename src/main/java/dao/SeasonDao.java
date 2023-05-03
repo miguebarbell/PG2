@@ -7,4 +7,5 @@ public interface SeasonDao {
 	List<Track> getEpisodesBySeasonId(int seasonId);
 	Float getRatingBySeasonId(int seasonId);
 	List<Season> getSeasonsByTvshowId(int tvShowId);
+	Float getProgressByUserIdAndSeasonId(int userId, int seasonId);
 }
