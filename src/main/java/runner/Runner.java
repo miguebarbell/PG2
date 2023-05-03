@@ -155,8 +155,8 @@ public class Runner {
 				printAdminMenu(user);
 			
 			try {
-				ans = Integer.parseInt(scan.nextLine());
-			} catch (InputMismatchException e) {
+				ans = Integer.parseInt(scan.nextLine().trim());
+			} catch (NumberFormatException e) {
 				System.out.println(c.RED + "Input must be a valid integer" + c.RESET);
 			}
 
@@ -172,7 +172,7 @@ public class Runner {
 				}
 				if(ans == 5) doLoop = false; //log out
 			}
-			
+			ans = 0;
 		} while(doLoop);
 			
 	}
