@@ -1,11 +1,11 @@
 package dao;
 
 public enum RatingType {
-	REALLY_BAD(0),
-	BAD(1),
-	AVERAGE(2),
-	GOOD(3),
-	THE_BEST(4);
+	REALLY_BAD(1),
+	BAD(2),
+	AVERAGE(3),
+	GOOD(4),
+	THE_BEST(5);
 	private final int value;
 
 	RatingType(int value) {

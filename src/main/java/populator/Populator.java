@@ -144,20 +144,20 @@ public class Populator {
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 8, 'completed')");
 			// give some ratings
 			// user_id 1
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 1, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 1, 4)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 2, 4)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 3, 3)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 4, 3)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 5, 5)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 6, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 5, 2)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 6, 1)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 7, 4)");
 			// user_id 2
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 1, 3)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 2, 2)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 3, 3)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 4, 3)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 5, 5)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 6, 0)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 5, 0)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 6, 1)");
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}

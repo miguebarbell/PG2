@@ -102,7 +102,6 @@ public class AlbumDaoSql implements AlbumDao {
 			e.printStackTrace();
 		}
 		String key = props.getProperty("key");
-		String url = "https://api.themoviedb.org/3/tv/%s?api_key=%s".formatted(code, key);
 		TmdbApi tmdbApi = new TmdbApi(key);
 		TvSeries newSerie = tmdbApi.getTvSeries().getSeries(code, "en");
 		String name = newSerie.getOriginalName();
@@ -213,7 +212,7 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 
-	Float getRatingByAlbumId(Integer albumId) {
+	public Float getRatingByAlbumId(Integer albumId) {
 		AtomicReference<Float> rating = new AtomicReference<>(0f);
 		AtomicInteger count = new AtomicInteger();
 		SeasonDaoImpl seasonDao = new SeasonDaoImpl();

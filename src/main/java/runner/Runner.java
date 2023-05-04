@@ -165,12 +165,18 @@ public class Runner {
 				if (ans >= 1 && ans <= 4) { //valid
 					chooseOption(ans + 1);
 				}
-				if (ans == 4) doLoop = false; //log out
+				if (ans == 4) {
+					doLoop = false; //log out
+					user = null;
+				}
 			} else {
 				if (ans >= 1 && ans <= 5) { //valid
 					chooseOption(ans);
 				}
-				if (ans == 5) doLoop = false; //log out
+				if (ans == 5) {
+					doLoop = false; //log out
+					user = null;
+				}
 			}
 			ans = 0;
 		} while (doLoop);
@@ -235,7 +241,7 @@ public class Runner {
 		clear();
 
 		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);
-		System.out.println("1: Add/Update Progress");
+		System.out.println("1: Add/Update Progress/Rating");
 		System.out.println("2: Recommend me a show");
 		System.out.println("3: List Albums");
 		System.out.println("4: Logout");
@@ -248,7 +254,7 @@ public class Runner {
 		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);
 		System.out.println("You are logged in as an " + c.WHITE_UNDERLINED + "admin." + c.RESET);
 		System.out.println(c.WHITE_BOLD + "1: Add Show" + c.RESET);
-		System.out.println("2: Add/Update Progress");
+		System.out.println("2: Add/Update Progress/Rating");
 		System.out.println("3: Recommend me a show");
 		System.out.println("4: List Shows");
 		System.out.println("5: Logout");
