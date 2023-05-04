@@ -14,7 +14,7 @@ public class AdminMenu {
         }
     }
 
-    public static boolean optionsListValidator(String tvTitleChoice, List<TvSerieDTO> results) {
+    public static boolean optionsListValidator(String tvTitleChoice, List<?> results) {
         if (tvTitleChoice.equals("q")) return true;
         try {
             results.get(Integer.parseInt(tvTitleChoice) - 1);
