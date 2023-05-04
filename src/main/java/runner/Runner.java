@@ -2,7 +2,6 @@ package runner;
 
 import java.util.InputMismatchException;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import dao.UserDaoSql;
@@ -20,8 +19,9 @@ import dao.User;
 public class Runner {
 	// fix static error, then get rid of this object
 	private static ConsoleColors c = new ConsoleColors();
-	private static Scanner scan = new Scanner(System.in);
-
+	public static Scanner scan = new Scanner(System.in);
+	public static User user = null;
+	public static AlbumDaoSql albumCaller = new AlbumDaoSql();
 	public static void main(String[] args) {
 
 		// comment this line out for persistent data
@@ -57,18 +57,19 @@ public class Runner {
 					System.out.println(c.RESET);
 
 					User loggedUser = new User(username, password);
-					User verifiedUser = userCaller.loginUser(loggedUser);
-					if (verifiedUser != null) {
+					user = userCaller.loginUser(loggedUser);
+					if (user != null) {
 						// call menu function
 						clear();
-						System.out.println(c.GREEN + "You have successfully logged in " + verifiedUser.getUsername()
+						System.out.println(c.GREEN + "You have successfully logged in " + user.getUsername()
 								+ "!" + c.RESET);
-						try {
-							loggedMenu(verifiedUser);
+//						try {
+							loggedMenu();
 							System.out.print(loginMenu);
-						} catch (TrackingException e) {
-							e.printStackTrace();
-						}
+//						}
+//						catch (TrackingException e) {
+//							e.printStackTrace();
+//						}
 					} else {
 						// throw LoginException and catch it
 						throw new LoginException();
@@ -143,10 +144,10 @@ public class Runner {
 		System.out.println(sb);
 	}
 
-	public static void loggedMenu(User user) throws TrackingException {			
+	public static void loggedMenu() {
 		//2 separate menus for user and admin
 		//chooseOption() will remerge the two
-		
+
 		boolean doLoop = true;
 		int ans = 0;
 		do {
@@ -154,40 +155,40 @@ public class Runner {
 				printUserMenu(user);
 			else
 				printAdminMenu(user);
-			
+
 			try {
 				ans = Integer.parseInt(scan.nextLine().trim());
 			} catch (NumberFormatException e) {
 				System.out.println(c.RED + "Input must be a valid integer" + c.RESET);
 			}
 			System.out.print(c.RESET);
-			
+
 			if(user.getUserType() == UserTypes.USER) {
 				if(ans >= 1 && ans <= 4) { //valid
-					chooseOption(ans + 1, user);
+					chooseOption(ans + 1);
 				}
 				if(ans == 4) doLoop = false; //log out
 			}
 			else {
 				if(ans >= 1 && ans <= 5) { //valid
-					chooseOption(ans, user);
+					chooseOption(ans);
 				}
 				if(ans == 5) doLoop = false; //log out
 			}
 			ans = 0;
 		} while(doLoop);
-			
+
 	}
 
-	public static void chooseOption(int ans, User user) throws TrackingException {
-		AlbumDaoSql albumCaller = new AlbumDaoSql();	
-		ProgressDaoSql progressCaller = new ProgressDaoSql();		
+	public static void chooseOption(int ans) {
+		ProgressDaoSql progressCaller = new ProgressDaoSql();
 		clear();
-		
+
 		switch (ans) {
 		case 0: break;
 		case 1:
-			addAlbum(albumCaller);
+			AdminMenu.automatic();
+//			addAlbum(albumCaller);
 			break;
 
 		case 2:
@@ -196,9 +197,9 @@ public class Runner {
 			int userId = user.getUser_id();
 
 			List<Album> albList = albumCaller.getAllAlbums();
-			
+
 			int albumId = -1;
-			do {				
+			do {
 				System.out.println(c.CYAN + "ADD PROGRESS" + c.RESET);
 				System.out.println("\nID  -  Title");
 				albList.forEach(album -> {
@@ -208,8 +209,8 @@ public class Runner {
 						System.out.printf("%s  -  %s\n", album.getAlbum_id(), album.getAlbum());
 				});
 				System.out.print("Please choose an ID:" + c.YELLOW);
-				try {	
-					albumId = Integer.parseInt(scan.nextLine().trim());										
+				try {
+					albumId = Integer.parseInt(scan.nextLine().trim());
 					if(albumId < -1) {
 						clear();
 						System.out.println(c.RED + "Invalid album ID. Try again." + c.RESET);
@@ -217,8 +218,8 @@ public class Runner {
 				} catch (Exception e) {
 					clear();
 					System.out.println(c.RED + "Invalid album ID. Try again." + c.RESET);
-				}				
-				
+				}
+
 				System.out.print(c.RESET);
 			} while(albumId <= 0);
 
@@ -228,8 +229,8 @@ public class Runner {
 			progressMenu();
 
 			int choice = 0;
-			try {	
-				choice = Integer.parseInt(scan.nextLine().trim());										
+			try {
+				choice = Integer.parseInt(scan.nextLine().trim());
 				if(choice < 0) {
 					clear();
 					System.out.println(c.RED + "Invalid album ID. Try again." + c.RESET);
@@ -252,8 +253,9 @@ public class Runner {
 					if (progressAddResult) {
 						System.out.println(progressAdded);
 						System.out.println(c.GREEN + "Progress tracker successfully added" + c.RESET);
-					} else {						
-						throw new TrackingException(message);
+					} else {
+						System.out.println(message);
+//						throw new TrackingException(message);
 					}
 					stillChoosing = false;
 					break;
@@ -265,7 +267,8 @@ public class Runner {
 						System.out.println(progressAdded2);
 						System.out.println(c.GREEN + "Progress tracker successfully added" + c.RESET);
 					} else {
-						throw new TrackingException(message);
+						System.out.println(message);
+//						throw new TrackingException(message);
 					}
 					stillChoosing = false;
 					break;
@@ -277,7 +280,8 @@ public class Runner {
 						System.out.println(progressAdded3);
 						System.out.println(c.GREEN + "Progress tracker successfully added" + c.RESET);
 					} else {
-						throw new TrackingException(message);
+						System.out.println(message);
+//						throw new TrackingException(message);
 					}
 					stillChoosing = false;
 					break;
@@ -323,7 +327,7 @@ public class Runner {
 						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
 					} else {
 						System.out.println(c.RED + "Could not update progress tracker" + c.RESET);
-						throw new TrackingException();
+//						throw new TrackingException();
 					}
 					stillChoosing2 = false;
 					break;
@@ -336,7 +340,7 @@ public class Runner {
 						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
 					} else {
 						System.out.println(c.RED + "Could not update progress tracker" + c.RESET);
-						throw new TrackingException();
+//						throw new TrackingException();
 					}
 					stillChoosing2 = false;
 					break;
@@ -349,7 +353,7 @@ public class Runner {
 						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
 					} else {
 						System.out.println(c.RED + "Could not update progress tracker" + c.RESET);
-						throw new TrackingException();
+//						throw new TrackingException();
 					}
 					stillChoosing2 = false;
 					break;
@@ -378,7 +382,7 @@ public class Runner {
 			scan.nextLine();
 			break;
 
-		case 5:			
+		case 5:
 			System.out.println("You have logged out\n");
 			break;
 
@@ -386,21 +390,21 @@ public class Runner {
 			System.out.println("Invalid input, try again!\n");
 		}
 	}
-		
+
 	public static void printUserMenu(User user) {
 		clear();
-		
-		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);		
+
+		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);
 		System.out.println("1: Add Progress");
 		System.out.println("2: Update Progress");
 		System.out.println("3: List Albums");
 		System.out.println("4: Logout");
 		System.out.print("Please choose an option (1-4):" + c.YELLOW);
 	}
-	
+
 	public static void printAdminMenu(User user) {
 		clear();
-		
+
 		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);
 		System.out.println("You are logged in as an " + c.WHITE_UNDERLINED + "admin." + c.RESET);
 		System.out.println(c.WHITE_BOLD + "1: Add Album" + c.RESET);
@@ -410,8 +414,8 @@ public class Runner {
 		System.out.println("5: Logout");
 		System.out.print("Please choose an option (1-5):" + c.YELLOW);
 	}
-	
-	
+
+
 	public static void progressMenu() {
 		System.out.println(c.CYAN + "How far are you?" + c.RESET);
 		System.out.println("6: Not Started");
@@ -428,18 +432,25 @@ public class Runner {
 	}
 
 	public static void addAlbum(AlbumDaoSql albumCaller) {
-		System.out.println("What's the name of the new album?");
-		String testVar = scan.next();
-		String albumName = testVar + scan.nextLine();
-
-		Album albumAdded = new Album(albumName);
-		int addResult = albumCaller.addAlbum(albumAdded);
-		if (addResult > 0) {
-			System.out.println(albumAdded);
-			System.out.println("Album successfully added");
-		} else {
-			System.out.println("Could not add album");
-		}
+		System.out.println("1. Manually\n2. Search on internet");
+		String adminOption;
+		do {
+			adminOption = Runner.scan.nextLine();
+			switch (adminOption) {
+				case "1" -> {
+					AdminMenu.manually();
+					adminOption = "q";
+				}
+				case "2" -> {
+					AdminMenu.automatic();
+					adminOption = "q";
+				}
+				case "q" -> {
+					return;
+				}
+				default -> System.out.println("Not a valid option");
+			}
+		} while ( adminOption.equals("q"));
 	}
 
 	public static void viewAlbums(List<Progress> progList) {
@@ -455,9 +466,9 @@ public class Runner {
 			Album progressAlbum =
 					albums.stream().filter(album -> album.getAlbum_id() == progress.getTrack_id())
 					      .findFirst().orElse(null);
-			
+
 			if(progressAlbum == null) return;
-			
+
 			if (progressAlbum.getAlbum_id() < 10)	System.out.printf("\n %s - %s -> %s", progressAlbum.getAlbum_id(),
 					progressAlbum.getAlbum(), progress.getProgress());
 			else System.out.printf("\n%s - %s -> %s", progressAlbum.getAlbum_id(),

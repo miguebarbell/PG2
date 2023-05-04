@@ -22,7 +22,6 @@ public class AlbumDaoSql implements AlbumDao {
 
 	private final Connection conn = ConnectionManager.getConnection();
 	Properties props = new Properties();
-	private final Connection conn = ConnectionManager.getConnection();
 
 	@Override
 	public Album getAlbumId(int a_id) {
@@ -152,7 +151,6 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 
-	@Override
 	public Float getProgressByUserIdAndAlbumId(int userId, int albumId) {
 		String sql = """
 				SELECT album_id, SUM(total) as completed, SUM(number) as total, SUM(total) / SUM(number) as percentage
