@@ -8,14 +8,17 @@ import utility.ConsoleColors;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static runner.ShowMenu.*;
 
 public class Runner {
 	// fix static error, then get rid of this object
 	public static ConsoleColors c;
-	public static ProgressDaoSql progressCaller = new ProgressDaoSql();
+	public static ProgressDaoSql progressDaoSql = new ProgressDaoSql();
 	public static Scanner scan = new Scanner(System.in);
 	public static User user = null;
-	public static AlbumDaoSql albumCaller = new AlbumDaoSql();
+	public static AlbumDaoSql albumDaoSql = new AlbumDaoSql();
 	public static void main(String[] args) {
 
 		// comment this line out for persistent data
@@ -185,12 +188,12 @@ public class Runner {
 			break;
 
 		case 2:
-			ShowMenu.addProgress();
+			addProgress();
 			break;
 
 		case 3:
 			// Update Progress
-			List<Progress> progList = progressCaller.getAllUserTrackers(user.getUser_id());
+			List<Progress> progList = progressDaoSql.getAllUserTrackers(user.getUser_id());
 			int userId2 = user.getUser_id();
 
 			System.out.println(c.CYAN + "ADD PROGRESS" + c.RESET);
@@ -215,7 +218,7 @@ public class Runner {
 				case 6:
 					progressChoice2 = progressStatus2[0];
 					Progress progressAdded = new Progress(userId2, albumId2, progressChoice2);
-					boolean progressAddResult = progressCaller.updateProgress(progressAdded);
+					boolean progressAddResult = progressDaoSql.updateProgress(progressAdded);
 					if (progressAddResult) {
 						System.out.println(progressAdded);
 						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
@@ -228,7 +231,7 @@ public class Runner {
 				case 7:
 					progressChoice2 = progressStatus2[1];
 					Progress progressAdded2 = new Progress(userId2, albumId2, progressChoice2);
-					boolean progressAddResult2 = progressCaller.updateProgress(progressAdded2);
+					boolean progressAddResult2 = progressDaoSql.updateProgress(progressAdded2);
 					if (progressAddResult2) {
 						System.out.println(progressAdded2);
 						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
@@ -241,7 +244,7 @@ public class Runner {
 				case 8:
 					progressChoice2 = progressStatus2[2];
 					Progress progressAdded3 = new Progress(userId2, albumId2, progressChoice2);
-					boolean progressAddResult3 = progressCaller.updateProgress(progressAdded3);
+					boolean progressAddResult3 = progressDaoSql.updateProgress(progressAdded3);
 					if (progressAddResult3) {
 						System.out.println(progressAdded3);
 						System.out.println(c.GREEN + "Progress tracker successfully updated" + c.RESET);
@@ -264,16 +267,33 @@ public class Runner {
 			break;
 
 		case 4:
-			List<Progress> progList2 = progressCaller.getAllUserTrackers(user.getUser_id());
-			// View Albums and their trackers
-			System.out.println("Your progress trackers and albums");
-			System.out.println("----------------------------------------------------------------------------");
+			// TODO: write all the status in this option
+			List<Album> albumsWithProgress = progressDaoSql.getAllAlbumsWithTrackerByUserId(user.getUser_id());
+			AtomicInteger seasonCounter = new AtomicInteger(0);
+			albumsWithProgress.forEach(album -> {
+				System.out.println("Season " + seasonCounter.incrementAndGet());
+				System.out.println(album.getAlbum());
+				List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(album.getAlbum_id());
+				seasonsByTvshowId.forEach(season -> {
+					Float progressBySeason =
+							seasonDao.getProgressByUserIdAndSeasonId(user.getUser_id(), season.getSeason_id());
+					if (null != progressBySeason) {
+						System.out.println((progressBySeason * 100)+"%");
+					}
+				});
+			});
 
-			viewAlbums(progList2);
 
-			System.out.println("\n");
-
-			scan.nextLine();
+//			List<Progress> progList2 = progressDaoSql.getAllUserTrackers(user.getUser_id());
+//			// View Albums and their trackers
+//			System.out.println("Your progress trackers and albums");
+//			System.out.println("----------------------------------------------------------------------------");
+//
+//			viewAlbums(progList2);
+//
+//			System.out.println("\n");
+//
+//			scan.nextLine();
 			break;
 
 		case 5:

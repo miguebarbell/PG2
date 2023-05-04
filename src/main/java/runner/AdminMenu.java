@@ -37,7 +37,7 @@ public class AdminMenu {
             if (newTvShowTitle.equals("q")) return;
         }
         while (blankValidator(newTvShowTitle, "Bad title"));
-        List<TvSerieDTO> results = Runner.albumCaller.searchByTitle(newTvShowTitle);
+        List<TvSerieDTO> results = Runner.albumDaoSql.searchByTitle(newTvShowTitle);
         String tvTitleChoice;
         do {
             for (int i = 0; i < results.size(); i++) {
@@ -55,7 +55,7 @@ public class AdminMenu {
             return;
         }
         TvSerieDTO tvserie = results.get(Integer.parseInt(tvTitleChoice) - 1);
-        Runner.albumCaller.addByCode(tvserie.id());
+        Runner.albumDaoSql.addByCode(tvserie.id());
         System.out.println("Added %s to the database".formatted(tvserie.name()));
       try {
           Thread.sleep(1500);

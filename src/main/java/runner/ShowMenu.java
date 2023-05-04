@@ -16,7 +16,7 @@ public class ShowMenu {
 
         int userId = Runner.user.getUser_id();
 
-        List<Album> albList = Runner.albumCaller.getAllAlbums();
+        List<Album> albList = Runner.albumDaoSql.getAllAlbums();
 
         int tvShowId = -1;
         do {
@@ -88,7 +88,7 @@ public class ShowMenu {
                 case 6:
                     progressChoice = progressStatus[0];
                     Progress progressAdded = new Progress(userId,episodeIdToTrack, progressChoice);
-                    boolean progressAddResult = progressCaller.addProgress(progressAdded);
+                    boolean progressAddResult = progressDaoSql.addProgress(progressAdded);
                     if (progressAddResult) {
                         System.out.println(progressAdded);
                         System.out.println(c.GREEN + "Progress tracker successfully added" + c.RESET);
@@ -101,7 +101,7 @@ public class ShowMenu {
                 case 7:
                     progressChoice = progressStatus[1];
                     Progress progressAdded2 = new Progress(userId, episodeIdToTrack, progressChoice);
-                    boolean progressAddResult2 = progressCaller.addProgress(progressAdded2);
+                    boolean progressAddResult2 = progressDaoSql.addProgress(progressAdded2);
                     if (progressAddResult2) {
                         System.out.println(progressAdded2);
                         System.out.println(c.GREEN + "Progress tracker successfully added" + c.RESET);
@@ -114,7 +114,7 @@ public class ShowMenu {
                 case 8:
                     progressChoice = progressStatus[2];
                     Progress progressAdded3 = new Progress(userId, episodeIdToTrack, progressChoice);
-                    boolean progressAddResult3 = progressCaller.addProgress(progressAdded3);
+                    boolean progressAddResult3 = progressDaoSql.addProgress(progressAdded3);
                     if (progressAddResult3) {
                         System.out.println(progressAdded3);
                         System.out.println(c.GREEN + "Progress tracker successfully added" + c.RESET);
