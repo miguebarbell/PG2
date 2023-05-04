@@ -24,7 +24,7 @@ public class OpenAI {
 				                 .map(show -> "%s %s/5\n".formatted(show.title(), String.format("%.2f", show.rating())))
 				                 .collect(Collectors.joining())
 		);
-		System.out.println(prompt);
+//		System.out.println(prompt);
 		Map<String, String> message = new HashMap<>();
 		message.put("role", "user");
 		message.put("content", prompt);

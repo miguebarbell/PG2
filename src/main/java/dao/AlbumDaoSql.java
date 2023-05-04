@@ -184,7 +184,7 @@ public class AlbumDaoSql implements AlbumDao {
 		return null;
 	}
 
-	List<AlbumDTO> getRecommendations(Integer userId, Integer numberOfSuggestions) {
+	public List<AlbumDTO> getRecommendations(Integer userId, Integer numberOfSuggestions) {
 //		String getMoviesAlreadyRated = """
 //				SELECT * FROM albums WHERE album_id IN
 //				    (SELECT album_id FROM seasons WHERE season_id IN
