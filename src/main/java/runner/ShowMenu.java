@@ -13,11 +13,8 @@ public class ShowMenu {
     public static ConsoleColors c;
 
     public static void addProgress() {
-
         int userId = Runner.user.getUser_id();
-
         List<Album> albList = Runner.albumDaoSql.getAllAlbums();
-
         int tvShowId = -1;
         do {
             System.out.println(c.CYAN + "ADD PROGRESS" + c.RESET);
@@ -124,7 +121,6 @@ public class ShowMenu {
                     }
                     stillChoosing = false;
                     break;
-
                 case 0:
                     break;
                 default:

@@ -208,19 +208,17 @@ public class Runner {
 					banner = "Displaying your progress by Show and Seasons";
 				}
 				System.out.println(banner);
-				AtomicInteger seasonCounter = new AtomicInteger(0);
 				albumsWithProgress.forEach(album -> {
 					System.out.println("Show:       " + album.getAlbum());
 					List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(album.getAlbum_id());
 					seasonsByTvshowId.forEach(season -> {
-						int seasonNumber = seasonCounter.incrementAndGet();
 						Float progressBySeason =
 								seasonDao.getProgressByUserIdAndSeasonId(user.getUser_id(), season.getSeason_id());
+
 						if (null != progressBySeason) {
-							System.out.printf("%s -> %s%n", "Season " + seasonNumber, (progressBySeason * 100) + "%");
+							System.out.printf("%s -> %s%n", season.getTitle(), (progressBySeason * 100) + "%");
 						}
 					});
-					seasonCounter.set(0);
 				});
 				break;
 
