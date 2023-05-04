@@ -24,6 +24,10 @@ public class User {
 
 	}
 
+	public UserTypes getUserType() {
+		return userType;
+	}
+	
 	/**
 	 * @return the user_id
 	 */

@@ -18,8 +18,8 @@ class SeasonDaoImplTest {
 	@DisplayName("Add new Season to Beef, tv show id 1")
 	void save() {
 		Season season = new Season("Season 2", 1);
-		boolean save = dao.save(season);
-		assertTrue(save);
+		int save = dao.save(season);
+		assertTrue(save != 0);
 	}
 
 	@Test

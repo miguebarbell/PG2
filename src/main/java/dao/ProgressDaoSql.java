@@ -18,15 +18,15 @@ public class ProgressDaoSql implements ProgressDao {
 	public List<Progress> getAllUserTrackers(int u_id) {
 
 
-     List<Progress> progList = new ArrayList<>();
+		List<Progress> progList = new ArrayList<>();
 
-		try( Statement stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery("SELECT * FROM progress where user_id = " + u_id)){
+		try (Statement stmt = conn.createStatement();
+		     ResultSet rs = stmt.executeQuery("SELECT * FROM progress where user_id = " + u_id)) {
 
 
-			while(rs.next()) {
+			while (rs.next()) {
 				int uid = rs.getInt("user_id");
-				int aid = rs.getInt("album_id");
+				int aid = rs.getInt("track_id");
 				String prog = rs.getString("progress");
 
 
@@ -46,7 +46,7 @@ public class ProgressDaoSql implements ProgressDao {
 	@Override
 	public boolean updateProgress(Progress progress) {
 
-		try ( PreparedStatement pstmt = conn.prepareStatement(
+		try (PreparedStatement pstmt = conn.prepareStatement(
 				"update progress set user_id = ?, track_id = ?, progress = ? where track_id = ?")) {
 
 			pstmt.setInt(1, progress.getUser_id());
@@ -56,7 +56,7 @@ public class ProgressDaoSql implements ProgressDao {
 
 			int i = pstmt.executeUpdate();
 
-			if(i > 0) {
+			if (i > 0) {
 				return true;
 			}
 		} catch (SQLException e) {
@@ -68,14 +68,14 @@ public class ProgressDaoSql implements ProgressDao {
 	@Override
 	public boolean addProgress(Progress progress) {
 
-		try( PreparedStatement pstmt = conn.prepareStatement(
-				"insert into progress(user_id, track_id, progress)values(?,?,?)")){
+		try (PreparedStatement pstmt = conn.prepareStatement(
+				"insert into progress(user_id, track_id, progress)values(?,?,?)")) {
 			pstmt.setInt(1, progress.getUser_id());
 			pstmt.setInt(2, progress.getTrack_id());
 			pstmt.setString(3, progress.getProgress());
 
 			int count = pstmt.executeUpdate();
-			if(count > 0) {
+			if (count > 0) {
 				return true;
 			}
 		} catch (SQLException e) {
@@ -85,4 +85,23 @@ public class ProgressDaoSql implements ProgressDao {
 		return false;
 	}
 
+	public List<Album> getAllAlbumsWithTrackerByUserId(int userId) {
+		ArrayList<Album> results = new ArrayList<>();
+		String sql = """
+				SELECT * FROM albums WHERE album_id IN
+				(SELECT album_id FROM seasons WHERE season_id IN
+				(SELECT distinct  season_id FROM tracks WHERE track_id IN (
+						SELECT track_id from progress where user_id = ?)));
+						""";
+		try (	PreparedStatement statement = conn.prepareStatement(sql)) {
+			statement.setInt(1,userId);
+			ResultSet resultSet = statement.executeQuery();
+			while (resultSet.next()) {
+				results.add(new Album(resultSet.getInt(1), resultSet.getString(2)));
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		return results;
+	}
 }

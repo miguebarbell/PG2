@@ -1,8 +1,8 @@
 package dao;
 
 public class Season {
-	private String title;
-	private Integer tvshow_id;
+	private final String title;
+	private final Integer tvshow_id;
 	private Integer season_id;
 
 	public Season(String title, Integer tvshow_id, Integer season_id) {

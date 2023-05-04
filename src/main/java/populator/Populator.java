@@ -25,7 +25,7 @@ public class Populator {
 
 			statement.execute("CREATE TABLE albums (" +
 			                  "album_id INT auto_increment PRIMARY KEY," +
-			                  "album varchar(255));");
+			                  "album varchar(255) UNIQUE);");
 
 
 			statement.execute("CREATE TABLE seasons(" +
@@ -121,6 +121,11 @@ public class Populator {
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 5, 'completed')");
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 6, 'completed')");
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 7, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 8, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 9, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 10, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 11, 'completed')");
+
 
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 19, 'completed')");
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (1, 20, 'completed')");
@@ -134,6 +139,9 @@ public class Populator {
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 3, 'completed')");
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 4, 'completed')");
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 5, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 6, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 7, 'completed')");
+			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 8, 'completed')");
 			// give some ratings
 			// user_id 1
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 1, 5)");
