@@ -149,6 +149,7 @@ public class Runner {
 		boolean doLoop = true;
 		int ans = 0;
 		do {
+			if(user == null) return;
 			if (user.getUserType() == UserTypes.USER)
 				printUserMenu(user);
 			else
