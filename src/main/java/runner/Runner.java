@@ -129,7 +129,7 @@ public class Runner {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 50; i++)
 			sb.append("\n");
-		String banner = c.PURPLE + c.WHITE_BACKGROUND + "\r\n"
+		String banner = c.PURPLE_BOLD + c.WHITE_BACKGROUND + "\r\n"
 		                + "  _________      __   _____ _                     _______             _             \r\n"
 		                + " |__   __\\ \\    / /  / ____| |                   |__   __|           | |            \r\n"
 		                + "    | |   \\ \\  / /  | (___ | |__   _____      __    | |_ __ __ _  ___| | _____ _ __ \r\n"
