@@ -264,5 +264,132 @@ FROM albums
 		}
 		return result;
 	}
+	
+	public List<AlbumCompletedDTO> getUsersCompleted(){
+		List<AlbumCompletedDTO> result = new ArrayList<>();
+		String query = "SELECT  "
+				+ "    q1.album, q1.users_completed, q2.users_watching "
+				+ "FROM "
+				+ "    (SELECT  "
+				+ "        a.album, users_completed "
+				+ "    FROM "
+				+ "        albums a "
+				+ "    LEFT JOIN (SELECT  "
+				+ "        a.album_id, COUNT(*) AS users_completed "
+				+ "    FROM "
+				+ "        (SELECT  "
+				+ "        t2.user_id, "
+				+ "            t1.album_id, "
+				+ "            t2.episodes_watched, "
+				+ "            t1.total_episodes "
+				+ "    FROM "
+				+ "        (SELECT  "
+				+ "        a.album_id, COUNT(*) AS total_episodes "
+				+ "    FROM "
+				+ "        seasons s "
+				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tracks t ON t.season_id = s.season_id "
+				+ "    GROUP BY album_id) t1 "
+				+ "    INNER JOIN (SELECT  "
+				+ "        user_id, a.album_id, COUNT(*) AS episodes_watched "
+				+ "    FROM "
+				+ "        progress p "
+				+ "    INNER JOIN tracks t ON p.track_id = t.track_id "
+				+ "    INNER JOIN seasons s ON t.season_id = s.season_id "
+				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    WHERE "
+				+ "        p.progress = 'completed' "
+				+ "    GROUP BY user_id , album_id) t2 ON t2.album_id = t1.album_id "
+				+ "    WHERE "
+				+ "        t2.episodes_watched = t1.total_episodes) t3 "
+				+ "    INNER JOIN albums a ON a.album_id = t3.album_id "
+				+ "    GROUP BY a.album_id) t4 ON a.album_id = t4.album_id) q1 "
+				+ "        INNER JOIN "
+				+ "    (SELECT  "
+				+ "        a.album, users_watching "
+				+ "    FROM "
+				+ "        albums a "
+				+ "    LEFT JOIN (SELECT  "
+				+ "        a.album_id, COUNT(*) AS users_watching "
+				+ "    FROM "
+				+ "        (SELECT  "
+				+ "        t3.user_id, a.album_id, COUNT(*) AS users_watching "
+				+ "    FROM "
+				+ "        (SELECT  "
+				+ "        t2.user_id, "
+				+ "            t1.album_id, "
+				+ "            t2.episodes_watched, "
+				+ "            t1.total_episodes "
+				+ "    FROM "
+				+ "        (SELECT  "
+				+ "        a.album_id, COUNT(*) AS total_episodes "
+				+ "    FROM "
+				+ "        seasons s "
+				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tracks t ON t.season_id = s.season_id "
+				+ "    GROUP BY album_id) t1 "
+				+ "    INNER JOIN (SELECT  "
+				+ "        user_id, a.album_id, COUNT(*) AS episodes_watched "
+				+ "    FROM "
+				+ "        progress p "
+				+ "    INNER JOIN tracks t ON p.track_id = t.track_id "
+				+ "    INNER JOIN seasons s ON t.season_id = s.season_id "
+				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    WHERE "
+				+ "        p.progress = 'completed' "
+				+ "    GROUP BY user_id , album_id) t2 ON t2.album_id = t1.album_id "
+				+ "    WHERE "
+				+ "        t2.episodes_watched < t1.total_episodes) t3 "
+				+ "    INNER JOIN albums a ON a.album_id = t3.album_id "
+				+ "    GROUP BY a.album_id , t3.user_id UNION SELECT  "
+				+ "        t3.user_id, a.album_id, COUNT(*) AS users_watching "
+				+ "    FROM "
+				+ "        (SELECT  "
+				+ "        t2.user_id, "
+				+ "            t1.album_id, "
+				+ "            t2.in_progress_episodes, "
+				+ "            t1.total_episodes "
+				+ "    FROM "
+				+ "        (SELECT  "
+				+ "        a.album_id, COUNT(*) AS total_episodes "
+				+ "    FROM "
+				+ "        seasons s "
+				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tracks t ON t.season_id = s.season_id "
+				+ "    GROUP BY album_id) t1 "
+				+ "    INNER JOIN (SELECT  "
+				+ "        user_id, a.album_id, COUNT(*) AS in_progress_episodes "
+				+ "    FROM "
+				+ "        progress p "
+				+ "    INNER JOIN tracks t ON p.track_id = t.track_id "
+				+ "    INNER JOIN seasons s ON t.season_id = s.season_id "
+				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    WHERE "
+				+ "        p.progress = 'not completed' "
+				+ "            OR p.progress = 'in-progress' "
+				+ "    GROUP BY user_id , album_id) t2 ON t2.album_id = t1.album_id) t3 "
+				+ "    INNER JOIN albums a ON a.album_id = t3.album_id "
+				+ "    GROUP BY a.album_id , t3.user_id) t4 "
+				+ "    INNER JOIN albums a ON a.album_id = t4.album_id "
+				+ "    GROUP BY a.album_id) t5 ON a.album_id = t5.album_id) q2 ON q1.album = q2.album";
+		
+		try (Statement stmt = conn.createStatement();
+			 ResultSet rs = stmt.executeQuery(query)) {
 
+			while (rs.next()) {
+				String album = rs.getString("album");
+				int usersCompleted = rs.getInt("users_completed");
+				int usersWatching = rs.getInt("users_watching");
+
+				AlbumCompletedDTO ac = new AlbumCompletedDTO(album, usersCompleted, usersWatching);
+				result.add(ac);
+
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Could not get the number of users who are watching or have completed watching a show");
+		}
+		return result;
+	}
+	
 }
