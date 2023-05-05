@@ -200,6 +200,12 @@ public class Runner {
 				break;
 
 			case 4:
+				// Showing the show and number of users who have finished watching a show and still watching a show.
+				List<AlbumCompletedDTO> usersCompletedOrInProgress = albumDaoSql.getUsersCompleted(); 
+				for(AlbumCompletedDTO ac: usersCompletedOrInProgress) {
+					System.out.println("Show: " + ac.album() + ",  usersCompleted: " + ac.usersCompletd() + ",  usersWatching: " + ac.usersWatching());
+				}
+				
 				String banner;
 				List<Album> albumsWithProgress = progressDaoSql.getAllAlbumsWithTrackerByUserId(user.getUser_id());
 				if (albumsWithProgress.isEmpty()) {
