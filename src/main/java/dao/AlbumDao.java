@@ -12,4 +12,6 @@ public interface AlbumDao {
 
 	boolean addByCode(Integer code);
 	List<TvSerieDTO> searchByTitle(String title);
+	
+	public List<AlbumCompletedDTO> getUsersCompleted();
 }
