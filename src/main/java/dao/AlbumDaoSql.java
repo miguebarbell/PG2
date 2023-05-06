@@ -2,7 +2,6 @@ package dao;
 
 import connection.ConnectionManager;
 import info.movito.themoviedbapi.*;
-import info.movito.themoviedbapi.model.people.Person;
 import info.movito.themoviedbapi.model.tv.TvEpisode;
 import info.movito.themoviedbapi.model.tv.TvSeason;
 import info.movito.themoviedbapi.model.tv.TvSeries;
@@ -13,7 +12,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -26,27 +24,27 @@ public class AlbumDaoSql implements AlbumDao {
 	@Override
 	public Album getAlbumId(int a_id) {
 
-		try (PreparedStatement pstmt = conn.prepareStatement("select * from albums where album_id = ?")) {
+		try (PreparedStatement pstmt = conn.prepareStatement("select * from tvshows where show_id = ?")) {
 
 			pstmt.setInt(1, a_id);
 
 			ResultSet rs = pstmt.executeQuery();
-			Album album = null;
+			Album show = null;
 
 			if (rs.next()) {
-				int album_id = rs.getInt("album_id");
-				String album_name = rs.getString("album");
+				int show_id = rs.getInt("show_id");
+				String show_name = rs.getString("show");
 
-				album = new Album(album_id, album_name);
+				show = new Album(show_id, show_name);
 
 			}
 
 			rs.close();
 
-			return album;
+			return show;
 
 		} catch (SQLException e) {
-			System.out.println("Could not find album id" + a_id);
+			System.out.println("Could not find show id" + a_id);
 		}
 
 		return null;
@@ -58,36 +56,36 @@ public class AlbumDaoSql implements AlbumDao {
 		List<Album> albList = new ArrayList<>();
 
 		try (Statement stmt = conn.createStatement();
-		     ResultSet rs = stmt.executeQuery("SELECT * FROM albums")) {
+		     ResultSet rs = stmt.executeQuery("SELECT * FROM tvshows")) {
 
 			while (rs.next()) {
-				int id = rs.getInt("album_id");
+				int id = rs.getInt("show_id");
 
-				String albumN = rs.getString("album");
+				String showN = rs.getString("show");
 
-				Album album = new Album(id, albumN);
-				albList.add(album);
+				Album show = new Album(id, showN);
+				albList.add(show);
 
 			}
 
 		} catch (SQLException e) {
-			System.out.println("Could not retrieve list of albums");
+			System.out.println("Could not retrieve list of shows");
 		}
 		return albList;
 	}
 
 	@Override
-	public Integer addAlbum(Album album) {
+	public Integer addAlbum(Album show) {
 
-		try (PreparedStatement pstmt = conn.prepareStatement("INSERT into albums(album)values(?)", Statement.RETURN_GENERATED_KEYS)) {
+		try (PreparedStatement pstmt = conn.prepareStatement("INSERT into tvshows(`show`)values(?)", Statement.RETURN_GENERATED_KEYS)) {
 
-			pstmt.setString(1, album.getAlbum());
+			pstmt.setString(1, show.getAlbum());
 
 			int count = pstmt.executeUpdate();
 			ResultSet generatedKeys = pstmt.getGeneratedKeys();
 			if (generatedKeys.next()) return generatedKeys.getInt(1);
 		} catch (SQLException e) {
-			System.out.println("TV SHOW: '%s' is already in the database".formatted(album.getAlbum()));
+			System.out.println("TV SHOW: '%s' is already in the database".formatted(show.getAlbum()));
 		}
 		return 0;
 	}
@@ -151,9 +149,9 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 
-	public Float getProgressByUserIdAndAlbumId(int userId, int albumId) {
+	public Float getProgressByUserIdAndAlbumId(int userId, int showId) {
 		String sql = """
-				SELECT album_id, SUM(total) as completed, SUM(number) as total, SUM(total) / SUM(number) as percentage
+				SELECT show_id, SUM(total) as completed, SUM(number) as total, SUM(total) / SUM(number) as percentage
 				FROM seasons
 				INNER JOIN
 				(SELECT season_id, COUNT(number) AS number, COUNT(q1.track_id) as total
@@ -166,13 +164,13 @@ public class AlbumDaoSql implements AlbumDao {
 				on q1.track_id = t.track_id
 				GROUP BY season_id) j1
 				ON seasons.season_id = j1.season_id
-				WHERE album_id = ?
-				GROUP BY album_id;
+				WHERE show_id = ?
+				GROUP BY show_id;
 						""";
 		try (PreparedStatement statement = conn.prepareStatement(sql)) {
 
 			statement.setInt(1, userId);
-			statement.setInt(2, albumId);
+			statement.setInt(2, showId);
 			ResultSet resultSet = statement.executeQuery();
 			if (resultSet.next()) {
 				return resultSet.getFloat(4);
@@ -186,18 +184,18 @@ public class AlbumDaoSql implements AlbumDao {
 
 	public List<AlbumDTO> getRecommendations(Integer userId, Integer numberOfSuggestions) {
 //		String getMoviesAlreadyRated = """
-//				SELECT * FROM albums WHERE album_id IN
-//				    (SELECT album_id FROM seasons WHERE season_id IN
+//				SELECT * FROM shows WHERE show_id IN
+//				    (SELECT show_id FROM seasons WHERE season_id IN
 //				    (SELECT season_id FROM tracks
 //				    INNER JOIN ratings r on tracks.track_id = r.track_id AND r.user_id = ?))
 //								""";
 		String sqlTvShowsAlreadyRatedAndTheRated = """
-				SELECT album, AVG(rating) as rating
+				SELECT `show`, AVG(rating) as rating
 				FROM ratings
 				         INNER JOIN tracks t ON ratings.track_id = t.track_id AND ratings.user_id = ?
 				         INNER JOIN seasons s ON t.season_id = s.season_id
-				         INNER JOIN albums a on s.album_id = a.album_id
-				GROUP BY album;
+				         INNER JOIN tvshows a on s.show_id = a.show_id
+				GROUP BY `show`;
 								""";
 		List<AlbumDTO> showsRated = new ArrayList<>();
 		try (PreparedStatement gmarStmt = conn.prepareStatement(sqlTvShowsAlreadyRatedAndTheRated)) {
@@ -213,11 +211,11 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 
-	Float getRatingByAlbumId(Integer albumId) {
+	Float getRatingByAlbumId(Integer showId) {
 		AtomicReference<Float> rating = new AtomicReference<>(0f);
 		AtomicInteger count = new AtomicInteger();
 		SeasonDaoImpl seasonDao = new SeasonDaoImpl();
-		List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(albumId);
+		List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(showId);
 		seasonsByTvshowId.forEach(season -> {
 			Float ratingBySeasonId = seasonDao.getRatingBySeasonId(season.getSeason_id());
 			if (ratingBySeasonId != null) {
@@ -231,10 +229,10 @@ public class AlbumDaoSql implements AlbumDao {
 	List<AlbumDTO> getProgressByUserId(int userId) {
 		List<AlbumDTO> result = new ArrayList<>();
 		String sql = """
-SELECT album, percentage
-FROM albums
+SELECT `show`, percentage
+FROM tvshows
          INNER JOIN
-     (SELECT album_id, SUM(total) as completed, SUM(number) as total, SUM(total) / SUM(number) as percentage
+     (SELECT show_id, SUM(total) as completed, SUM(number) as total, SUM(total) / SUM(number) as percentage
       FROM seasons
                INNER JOIN
            (SELECT season_id, COUNT(number) AS number, COUNT(q1.track_id) as total
@@ -247,8 +245,8 @@ FROM albums
                  on q1.track_id = t.track_id
             GROUP BY season_id) j1
            ON seasons.season_id = j1.season_id
-      GROUP BY album_id) j2
-     ON j2.album_id = albums.album_id
+      GROUP BY show_id) j2
+     ON j2.show_id = tvshows.show_id
 								""";
 		try (PreparedStatement statement = conn.prepareStatement(sql)) {
 			statement.setInt(1, userId);
@@ -265,124 +263,124 @@ FROM albums
 		}
 		return result;
 	}
-	
+
 	public List<AlbumCompletedDTO> getUsersCompleted(){
 		List<AlbumCompletedDTO> result = new ArrayList<>();
 		String query = "SELECT  "
-				+ "    q1.album, q1.users_completed, q2.users_watching "
+				+ "    q1.`show`, q1.users_completed, q2.users_watching "
 				+ "FROM "
 				+ "    (SELECT  "
-				+ "        a.album, users_completed "
+				+ "        a.`show`, users_completed "
 				+ "    FROM "
-				+ "        albums a "
+				+ "        tvshows a "
 				+ "    LEFT JOIN (SELECT  "
-				+ "        a.album_id, COUNT(*) AS users_completed "
+				+ "        a.show_id, COUNT(*) AS users_completed "
 				+ "    FROM "
 				+ "        (SELECT  "
 				+ "        t2.user_id, "
-				+ "            t1.album_id, "
+				+ "            t1.show_id, "
 				+ "            t2.episodes_watched, "
 				+ "            t1.total_episodes "
 				+ "    FROM "
 				+ "        (SELECT  "
-				+ "        a.album_id, COUNT(*) AS total_episodes "
+				+ "        a.show_id, COUNT(*) AS total_episodes "
 				+ "    FROM "
 				+ "        seasons s "
-				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tvshows a ON s.show_id = a.show_id "
 				+ "    INNER JOIN tracks t ON t.season_id = s.season_id "
-				+ "    GROUP BY album_id) t1 "
+				+ "    GROUP BY show_id) t1 "
 				+ "    INNER JOIN (SELECT  "
-				+ "        user_id, a.album_id, COUNT(*) AS episodes_watched "
+				+ "        user_id, a.show_id, COUNT(*) AS episodes_watched "
 				+ "    FROM "
 				+ "        progress p "
 				+ "    INNER JOIN tracks t ON p.track_id = t.track_id "
 				+ "    INNER JOIN seasons s ON t.season_id = s.season_id "
-				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tvshows a ON s.show_id = a.show_id "
 				+ "    WHERE "
 				+ "        p.progress = 'completed' "
-				+ "    GROUP BY user_id , album_id) t2 ON t2.album_id = t1.album_id "
+				+ "    GROUP BY user_id , show_id) t2 ON t2.show_id = t1.show_id "
 				+ "    WHERE "
 				+ "        t2.episodes_watched = t1.total_episodes) t3 "
-				+ "    INNER JOIN albums a ON a.album_id = t3.album_id "
-				+ "    GROUP BY a.album_id) t4 ON a.album_id = t4.album_id) q1 "
+				+ "    INNER JOIN tvshows a ON a.show_id = t3.show_id "
+				+ "    GROUP BY a.show_id) t4 ON a.show_id = t4.show_id) q1 "
 				+ "        INNER JOIN "
 				+ "    (SELECT  "
-				+ "        a.album, users_watching "
+				+ "        a.`show`, users_watching "
 				+ "    FROM "
-				+ "        albums a "
+				+ "        tvshows a "
 				+ "    LEFT JOIN (SELECT  "
-				+ "        a.album_id, COUNT(*) AS users_watching "
+				+ "        a.show_id, COUNT(*) AS users_watching "
 				+ "    FROM "
 				+ "        (SELECT  "
-				+ "        t3.user_id, a.album_id, COUNT(*) AS users_watching "
+				+ "        t3.user_id, a.show_id, COUNT(*) AS users_watching "
 				+ "    FROM "
 				+ "        (SELECT  "
 				+ "        t2.user_id, "
-				+ "            t1.album_id, "
+				+ "            t1.show_id, "
 				+ "            t2.episodes_watched, "
 				+ "            t1.total_episodes "
 				+ "    FROM "
 				+ "        (SELECT  "
-				+ "        a.album_id, COUNT(*) AS total_episodes "
+				+ "        a.show_id, COUNT(*) AS total_episodes "
 				+ "    FROM "
 				+ "        seasons s "
-				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tvshows a ON s.show_id = a.show_id "
 				+ "    INNER JOIN tracks t ON t.season_id = s.season_id "
-				+ "    GROUP BY album_id) t1 "
+				+ "    GROUP BY show_id) t1 "
 				+ "    INNER JOIN (SELECT  "
-				+ "        user_id, a.album_id, COUNT(*) AS episodes_watched "
+				+ "        user_id, a.show_id, COUNT(*) AS episodes_watched "
 				+ "    FROM "
 				+ "        progress p "
 				+ "    INNER JOIN tracks t ON p.track_id = t.track_id "
 				+ "    INNER JOIN seasons s ON t.season_id = s.season_id "
-				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tvshows a ON s.show_id = a.show_id "
 				+ "    WHERE "
 				+ "        p.progress = 'completed' "
-				+ "    GROUP BY user_id , album_id) t2 ON t2.album_id = t1.album_id "
+				+ "    GROUP BY user_id , show_id) t2 ON t2.show_id = t1.show_id "
 				+ "    WHERE "
 				+ "        t2.episodes_watched < t1.total_episodes) t3 "
-				+ "    INNER JOIN albums a ON a.album_id = t3.album_id "
-				+ "    GROUP BY a.album_id , t3.user_id UNION SELECT  "
-				+ "        t3.user_id, a.album_id, COUNT(*) AS users_watching "
+				+ "    INNER JOIN tvshows a ON a.show_id = t3.show_id "
+				+ "    GROUP BY a.show_id , t3.user_id UNION SELECT  "
+				+ "        t3.user_id, a.show_id, COUNT(*) AS users_watching "
 				+ "    FROM "
 				+ "        (SELECT  "
 				+ "        t2.user_id, "
-				+ "            t1.album_id, "
+				+ "            t1.show_id, "
 				+ "            t2.in_progress_episodes, "
 				+ "            t1.total_episodes "
 				+ "    FROM "
 				+ "        (SELECT  "
-				+ "        a.album_id, COUNT(*) AS total_episodes "
+				+ "        a.show_id, COUNT(*) AS total_episodes "
 				+ "    FROM "
 				+ "        seasons s "
-				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tvshows a ON s.show_id = a.show_id "
 				+ "    INNER JOIN tracks t ON t.season_id = s.season_id "
-				+ "    GROUP BY album_id) t1 "
+				+ "    GROUP BY show_id) t1 "
 				+ "    INNER JOIN (SELECT  "
-				+ "        user_id, a.album_id, COUNT(*) AS in_progress_episodes "
+				+ "        user_id, a.show_id, COUNT(*) AS in_progress_episodes "
 				+ "    FROM "
 				+ "        progress p "
 				+ "    INNER JOIN tracks t ON p.track_id = t.track_id "
 				+ "    INNER JOIN seasons s ON t.season_id = s.season_id "
-				+ "    INNER JOIN albums a ON s.album_id = a.album_id "
+				+ "    INNER JOIN tvshows a ON s.show_id = a.show_id "
 				+ "    WHERE "
 				+ "        p.progress = 'not completed' "
 				+ "            OR p.progress = 'in-progress' "
-				+ "    GROUP BY user_id , album_id) t2 ON t2.album_id = t1.album_id) t3 "
-				+ "    INNER JOIN albums a ON a.album_id = t3.album_id "
-				+ "    GROUP BY a.album_id , t3.user_id) t4 "
-				+ "    INNER JOIN albums a ON a.album_id = t4.album_id "
-				+ "    GROUP BY a.album_id) t5 ON a.album_id = t5.album_id) q2 ON q1.album = q2.album";
-		
+				+ "    GROUP BY user_id , show_id) t2 ON t2.show_id = t1.show_id) t3 "
+				+ "    INNER JOIN tvshows a ON a.show_id = t3.show_id "
+				+ "    GROUP BY a.show_id , t3.user_id) t4 "
+				+ "    INNER JOIN tvshows a ON a.show_id = t4.show_id "
+				+ "    GROUP BY a.show_id) t5 ON a.show_id = t5.show_id) q2 ON q1.`show` = q2.`show`";
+
 		try (Statement stmt = conn.createStatement();
 			 ResultSet rs = stmt.executeQuery(query)) {
 
 			while (rs.next()) {
-				String album = rs.getString("album");
+				String show = rs.getString("show");
 				int usersCompleted = rs.getInt("users_completed");
 				int usersWatching = rs.getInt("users_watching");
 
-				AlbumCompletedDTO ac = new AlbumCompletedDTO(album, usersCompleted, usersWatching);
+				AlbumCompletedDTO ac = new AlbumCompletedDTO(show, usersCompleted, usersWatching);
 				result.add(ac);
 
 			}
@@ -392,5 +390,5 @@ FROM albums
 		}
 		return result;
 	}
-	
+
 }

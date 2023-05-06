@@ -88,8 +88,8 @@ public class ProgressDaoSql implements ProgressDao {
 	public List<Album> getAllAlbumsWithTrackerByUserId(int userId) {
 		ArrayList<Album> results = new ArrayList<>();
 		String sql = """
-				SELECT * FROM albums WHERE album_id IN
-				(SELECT album_id FROM seasons WHERE season_id IN
+				SELECT * FROM tvshows WHERE show_id IN
+				(SELECT show_id FROM seasons WHERE season_id IN
 				(SELECT distinct  season_id FROM tracks WHERE track_id IN (
 						SELECT track_id from progress where user_id = ?)));
 						""";

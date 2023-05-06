@@ -38,3 +38,6 @@ This works with a MySQL database, so that service needs to be available and runn
 ### This is an example of what is going on internally with chat gpt.
 
 ![example of a prompt](./doc/example_of_prompt.png)
+
+### ER Diagram
+![database](./doc/er_diagram.png)
