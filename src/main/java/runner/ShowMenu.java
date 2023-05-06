@@ -17,22 +17,25 @@ public class ShowMenu {
 		List<Album> albList = albumDaoSql.getAllAlbums();
 		int tvShowId = -1;
 		do {
-			System.out.println(c.CYAN + "ADD PROGRESS" + c.RESET);
-			System.out.println("\nID  -  Title");
+			System.out.println(c.GREEN + "UPDATE PROGRESS/RATING" + c.RESET);
+			System.out.printf("%s%-4s%s | %-7s | %-30s\n", ConsoleColors.CYAN, "ID", ConsoleColors.RESET, "Rating", "Title");
 			albList.forEach(album -> {
 
 				Float ratingByAlbumId = albumDaoSql.getRatingByAlbumId(album.getAlbum_id());
-				String oneDecimalRating = ratingByAlbumId == null ? "---" : String.format("%.1f", ratingByAlbumId);
-				if (album.getAlbum_id() < 10)
-					System.out.printf(" %s.  [%s]  %s\n",
-							album.getAlbum_id(),
-							oneDecimalRating,
-							album.getAlbum());
-				else
-					System.out.printf("%s.  [%s]  %s\n",
-							album.getAlbum_id(),
-							oneDecimalRating,
-									album.getAlbum());
+				String oneDecimalRating = ratingByAlbumId == null ? "---" : String.format("%.1f", ratingByAlbumId);				
+				
+				System.out.printf("%s%-4s%s |  [%-3s]  | %-30s\n", ConsoleColors.CYAN, album.getAlbum_id(), ConsoleColors.RESET, oneDecimalRating, album.getAlbum());
+				
+//				if (album.getAlbum_id() < 10)
+//					System.out.printf(" %s.  [%s]  %s\n",
+//							album.getAlbum_id(),
+//							oneDecimalRating,
+//							album.getAlbum());
+//				else
+//					System.out.printf("%s.  [%s]  %s\n",
+//							album.getAlbum_id(),
+//							oneDecimalRating,
+//									album.getAlbum());
 			});
 			System.out.print("Please choose an ID:" + c.YELLOW);
 			try {
@@ -48,41 +51,49 @@ public class ShowMenu {
 
 			System.out.print(c.RESET);
 		} while (tvShowId <= 0);
-
+		
+		System.out.println("\nSeasons:");		
 		List<Season> seasons = seasonDao.getSeasonsByTvshowId(tvShowId);
 		String seasonId;
 		do {
 			for (int i = 0; i < seasons.size(); i++) {
 				Float ratingBySeasonId = seasonDao.getRatingBySeasonId(seasons.get(i).getSeason_id());
-				System.out.printf("%s. [%s] %s%n",
-						i + 1,
+				System.out.printf("%s%s%s. [%s] %s%n",
+						ConsoleColors.CYAN, i + 1, ConsoleColors.RESET,
 						ratingBySeasonId == null ? "---" : String.format("%.1f", ratingBySeasonId),
 						seasons.get(i).getTitle());
 			}
-			System.out.println("Select your season");
+			System.out.print("Select a season:" + ConsoleColors.YELLOW);
 			seasonId = scan.nextLine();
+			System.out.print(ConsoleColors.RESET);
 		} while (!AdminMenu.optionsListValidator(seasonId, seasons));
+		
+		System.out.println("\nEpisodes:");
 		String episodeId;
 		List<Track> episodes = seasonDao.getEpisodesBySeasonId(seasons.get(Integer.parseInt(seasonId) - 1).getSeason_id());
 		do {
 			for (int i = 0; i < episodes.size(); i++) {
 				Float ratingByTrackId = trackDao.getRatingByTrackId(episodes.get(i).getId());
-				System.out.printf("%s. [%s] %s%n",
-						i + 1,
+				System.out.printf("%s%s%s. [%s] %s%n",
+						ConsoleColors.CYAN, i + 1, ConsoleColors.RESET,
 						null == ratingByTrackId ? "---" : String.format("%.1f", ratingByTrackId),
 						episodes.get(i).getTitle());
 			}
-			System.out.println("Select your episode");
+			System.out.print("Select an episode:" + ConsoleColors.YELLOW);
 			episodeId = scan.nextLine();
+			System.out.println(ConsoleColors.RESET);
 		} while (!AdminMenu.optionsListValidator(episodeId, episodes));
+		
 		String progressChoice;
 		String[] progressStatus = {"not completed", "in-progress", "completed", ""};
 		Integer episodeIdToTrack = episodes.get(Integer.parseInt(episodeId) - 1).getId();
 		String progressOrRating;
 		List<String> options = List.of("q", "1", "2");
 		do {
-			System.out.println("1. Add a progress.\n2. Add a rating.\nq to Cancel");
+			System.out.println("1. Add a progress.\n2. Add a rating.\nq to exit");
+			System.out.print("Choose an option:" + ConsoleColors.YELLOW);
 			progressOrRating = scan.nextLine();
+			System.out.println(ConsoleColors.RESET);
 		} while (!options.contains(progressOrRating));
 
 		if (progressOrRating.equals("q")) return;
@@ -152,15 +163,16 @@ public class ShowMenu {
 				}
 			}
 		} else {
-			System.out.println("ADD A RATING");
+			System.out.println(ConsoleColors.CYAN + "Rating Options" + ConsoleColors.RESET);
 			String rating;
 			List<String> ratingOptions = List.of("0", "1", "2", "3", "4", "q");
 			do {
-				System.out.println("0. Really Bad.\n1. Bad.\n2. Average.\n3. Good.\n4. The Best\nq to cancel.");
+				System.out.println("0. Really Bad.\n1. Bad.\n2. Average.\n3. Good.\n4. The Best\nq to exit.");
+				System.out.print("Choose a rating:" + ConsoleColors.YELLOW);
 				rating = scan.nextLine();
+				System.out.println(ConsoleColors.RESET);
 			} while (!ratingOptions.contains(rating));
 			if (rating.equals("q")) {
-				System.out.println("Cancelling");
 				return;
 			}
 			RatingType[] values = RatingType.values();

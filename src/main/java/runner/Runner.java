@@ -213,14 +213,20 @@ public class Runner {
 				List<AlbumCompletedDTO> usersCompletedOrInProgress = albumDaoSql.getUsersCompleted();
 
 				System.out.println(ConsoleColors.CYAN_BOLD + "Global User Data" + ConsoleColors.RESET);
+//				System.out.printf("%-30s | %-6s | %-22s | %-16s\n", "Title", "Rating", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
+//				System.out.println("----------------------------------------------------------------------------");
 				System.out.printf("%-30s | %-22s | %-16s\n", "Title", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
 				System.out.println("-------------------------------------------------------------------");
+
+				
 				for(AlbumCompletedDTO ac: usersCompletedOrInProgress) {
 					StringBuilder title = new StringBuilder(ac.album());
 					title.setLength(30);
-
+//					String showRating = albumDaoSql.getRatingByAlbumId(/*??*/) == null ? "----" : String.valueOf(Math.ceil(albumDaoSql.getRatingByAlbumId(/*??*/)*100)/100);
+//					String showRating = "2.50";
+//					System.out.printf("%-30s | [%-4s] | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), showRating, 
+//							ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
 					System.out.printf("%-30s | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
-//					System.out.println("Show: " + ac.album() + ",  usersCompleted: " + ac.usersCompletd() + ",  usersWatching: " + ac.usersWatching());
 				}
 				System.out.println(ConsoleColors.RESET);
 
@@ -235,23 +241,23 @@ public class Runner {
 				}
 				System.out.println(banner);
 				albumsWithProgress.forEach(album -> {
-//					System.out.println("Show:       " + album.getAlbum());
 					StringBuilder title = new StringBuilder(album.getAlbum());
 					title.setLength(30);
-					System.out.printf("%-6s | %-30s\n", "Title", title.toString().replace('\u0000', ' '));
+					String showRating = albumDaoSql.getRatingByAlbumId(album.getAlbum_id()) == null ? "----" : String.valueOf(Math.ceil(albumDaoSql.getRatingByAlbumId(album.getAlbum_id())*100)/100);
+					System.out.printf("[%-4s] | %-30s\n", showRating, title.toString().replace('\u0000', ' '));
+//					System.out.println("----------------------------------------------------------------------------");
 					System.out.println("-------------------------------------------------------------------");
-
 					List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(album.getAlbum_id());
 					seasonsByTvshowId.forEach(season -> {
 						Float progressBySeason =
 								seasonDao.getProgressByUserIdAndSeasonId(user.getUser_id(), season.getSeason_id());
 
 						if (null != progressBySeason) {
-//							System.out.printf("%s -> %s%n", season.getTitle(), (progressBySeason * 100) + "%");
+							String seasonRating = seasonDao.getRatingBySeasonId(season.getSeason_id()) == null ? "----" : String.valueOf(Math.ceil(seasonDao.getRatingBySeasonId(season.getSeason_id())*100)/100);
 							if(progressBySeason == 1)
-								System.out.printf("%-6s | %s%-15s -> %s%s\n", "", ConsoleColors.GREEN, season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100), ConsoleColors.RESET);
+								System.out.printf("[%-4s] | %s%-15s -> %s%s\n", seasonRating, ConsoleColors.GREEN, season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100), ConsoleColors.RESET);
 							else
-								System.out.printf("%-6s | %-15s -> %s\n", "", season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100));
+								System.out.printf("[%-4s] | %-15s -> %s\n", seasonRating, season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100));
 						}
 					});
 					System.out.println(ConsoleColors.CYAN + "\n\n" + ConsoleColors.RESET);
