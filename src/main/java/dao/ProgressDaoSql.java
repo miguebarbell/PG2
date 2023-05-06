@@ -67,16 +67,31 @@ public class ProgressDaoSql implements ProgressDao {
 
 	@Override
 	public boolean addProgress(Progress progress) {
-
-		try (PreparedStatement pstmt = conn.prepareStatement(
-				"insert into progress(user_id, track_id, progress)values(?,?,?)")) {
-			pstmt.setInt(1, progress.getUser_id());
-			pstmt.setInt(2, progress.getTrack_id());
-			pstmt.setString(3, progress.getProgress());
-
-			int count = pstmt.executeUpdate();
-			if (count > 0) {
-				return true;
+		String queryForAnExistingProgress = "SELECT * FROM progress WHERE user_id = ? AND track_id = ?";
+		String updateProgress = "update progress set progress = ? where user_id = ? and track_id = ?";
+		String insertSql = "insert into progress(user_id, track_id, progress)values(?,?,?)";
+		try (PreparedStatement pstmt = conn.prepareStatement(insertSql);
+		     PreparedStatement qstmt = conn.prepareStatement(queryForAnExistingProgress);
+		     PreparedStatement ustmt = conn.prepareStatement(updateProgress)) {
+			qstmt.setInt(1, progress.getUser_id());
+			qstmt.setInt(2, progress.getTrack_id());
+			if (qstmt.executeQuery().next()) {
+				//update
+				ustmt.setString(1, progress.getProgress());
+				ustmt.setInt(2, progress.getUser_id());
+				ustmt.setInt(3, progress.getTrack_id());
+				int rows = ustmt.executeUpdate();
+				if (rows > 0) {
+					return true;
+				}
+			}			else {
+				pstmt.setInt(1, progress.getUser_id());
+				pstmt.setInt(2, progress.getTrack_id());
+				pstmt.setString(3, progress.getProgress());
+				int count = pstmt.executeUpdate();
+				if (count > 0) {
+					return true;
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -88,8 +103,8 @@ public class ProgressDaoSql implements ProgressDao {
 	public List<Album> getAllAlbumsWithTrackerByUserId(int userId) {
 		ArrayList<Album> results = new ArrayList<>();
 		String sql = """
-				SELECT * FROM albums WHERE album_id IN
-				(SELECT album_id FROM seasons WHERE season_id IN
+				SELECT * FROM tvshows WHERE show_id IN
+				(SELECT show_id FROM seasons WHERE season_id IN
 				(SELECT distinct  season_id FROM tracks WHERE track_id IN (
 						SELECT track_id from progress where user_id = ?)));
 						""";

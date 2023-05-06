@@ -4,13 +4,14 @@ import dao.*;
 import exceptions.LoginException;
 import populator.Populator;
 import utility.ConsoleColors;
+import utility.ProgressBar;
 
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static runner.ShowMenu.*;
+import static runner.AdminMenu.*;
 
 public class Runner {
 	// fix static error, then get rid of this object
@@ -20,7 +21,7 @@ public class Runner {
 	public static User user = null;
 	public static AlbumDaoSql albumDaoSql = new AlbumDaoSql();
 
-	public static void main(String[] args) {
+	public static void run(String[] args) {
 
 		// comment this line out for persistent data
 		Populator.reset();
@@ -39,12 +40,12 @@ public class Runner {
 			System.out.print(c.RESET);
 			if (ans.isEmpty()) {
 				clear();
+				System.out.println(c.RED + "Invalid input. Please try again." + c.RESET);
 				System.out.print(loginMenu);
 				continue;
 			}
 
 			switch (ans.charAt(0)) {
-				case 'L':
 				case '1':
 					System.out.println(c.GREEN_BOLD + "\nPlease log in!" + c.RESET);
 					System.out.print("username:" + c.YELLOW);
@@ -85,13 +86,12 @@ public class Runner {
 						System.out.print(loginMenu);
 					}
 					break;
-				case 'R':
 				case '2':
 					System.out.println(c.YELLOW + "\nPlease try to use a unique username and a difficult password.\n"
 					                   + c.RESET + "We store your password with MD5 message-digest algorithm, 128bit hash value.");
-					System.out.println("\nusername:" + c.YELLOW);
+					System.out.print("\nusername:" + c.YELLOW);
 					String newUsername = scan.nextLine();
-					System.out.println(c.RESET + "\npassword:" + c.YELLOW);
+					System.out.print(c.RESET + "password:" + c.YELLOW);
 					String password = scan.nextLine();
 					System.out.print(c.RESET);
 
@@ -101,6 +101,7 @@ public class Runner {
 					} else {
 						System.out.println(c.RED + "\nError, try again with another username." + c.RESET);
 					}
+					scan.nextLine();
 					clear();
 					System.out.print(loginMenu);
 					break;
@@ -129,7 +130,7 @@ public class Runner {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < 50; i++)
 			sb.append("\n");
-		String banner = c.PURPLE + c.WHITE_BACKGROUND + "\r\n"
+		String banner = c.PURPLE_BOLD + c.WHITE_BACKGROUND + "\r\n"
 		                + "  _________      __   _____ _                     _______             _             \r\n"
 		                + " |__   __\\ \\    / /  / ____| |                   |__   __|           | |            \r\n"
 		                + "    | |   \\ \\  / /  | (___ | |__   _____      __    | |_ __ __ _  ___| | _____ _ __ \r\n"
@@ -149,6 +150,7 @@ public class Runner {
 		boolean doLoop = true;
 		int ans = 0;
 		do {
+			if(user == null) return;
 			if (user.getUserType() == UserTypes.USER)
 				printUserMenu(user);
 			else
@@ -165,12 +167,18 @@ public class Runner {
 				if (ans >= 1 && ans <= 4) { //valid
 					chooseOption(ans + 1);
 				}
-				if (ans == 4) doLoop = false; //log out
+				if (ans == 4) {
+					doLoop = false; //log out
+					user = null;
+				}
 			} else {
 				if (ans >= 1 && ans <= 5) { //valid
 					chooseOption(ans);
 				}
-				if (ans == 5) doLoop = false; //log out
+				if (ans == 5) {
+					doLoop = false; //log out
+					user = null;
+				}
 			}
 			ans = 0;
 		} while (doLoop);
@@ -184,50 +192,72 @@ public class Runner {
 			case 0:
 				break;
 			case 1:
-				AdminMenu.automatic();
+				automatic(); //AdminMenu.java
 				break;
 
 			case 2:
-				addProgress();
+				addProgress(); //ShowMenu.java
 				break;
 
-			case 3:
+			case 3: //Make sure to use a valid API key in OpenAI.java
 				List<AlbumDTO> recommendations = albumDaoSql.getRecommendations(user.getUser_id(), 5);
-				System.out.println("We asked to ChatGPT a recommendation for 5 shows based in the ratings that you currently have.");
+				System.out.println("We asked ChatGPT for a recommendation of 5 shows based on the ratings that you currently have.");
 				recommendations.forEach(albumDTO -> {
 					System.out.printf("%s. %s%n", albumDTO.recommendation(), albumDTO.title());
 				});
+				scan.nextLine();
 				break;
 
 			case 4:
 				// Showing the show and number of users who have finished watching a show and still watching a show.
-				List<AlbumCompletedDTO> usersCompletedOrInProgress = albumDaoSql.getUsersCompleted(); 
+				List<AlbumCompletedDTO> usersCompletedOrInProgress = albumDaoSql.getUsersCompleted();
+
+				System.out.println(ConsoleColors.CYAN_BOLD + "Global User Data" + ConsoleColors.RESET);
+				System.out.printf("%-30s | %-22s | %-16s\n", "Title", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
+				System.out.println("-------------------------------------------------------------------");
 				for(AlbumCompletedDTO ac: usersCompletedOrInProgress) {
-					System.out.println("Show: " + ac.album() + ",  usersCompleted: " + ac.usersCompletd() + ",  usersWatching: " + ac.usersWatching());
+					StringBuilder title = new StringBuilder(ac.album());
+					title.setLength(30);
+
+					System.out.printf("%-30s | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
+//					System.out.println("Show: " + ac.album() + ",  usersCompleted: " + ac.usersCompletd() + ",  usersWatching: " + ac.usersWatching());
 				}
-				
+				System.out.println(ConsoleColors.RESET);
+
+
+
 				String banner;
 				List<Album> albumsWithProgress = progressDaoSql.getAllAlbumsWithTrackerByUserId(user.getUser_id());
 				if (albumsWithProgress.isEmpty()) {
-					banner = "You don't have any episode completed yet";
+					banner = ConsoleColors.RED + "You don't have any episode completed yet" + ConsoleColors.RESET;
 				} else {
-					banner = "Displaying your progress by Show and Seasons";
+					banner = ConsoleColors.CYAN_BOLD + "Displaying " + user.getUsername() + "'s progress by Show and Season" + ConsoleColors.RESET;
 				}
 				System.out.println(banner);
-				AtomicInteger seasonCounter = new AtomicInteger(0);
 				albumsWithProgress.forEach(album -> {
-					System.out.println("Show:       " + album.getAlbum());
+//					System.out.println("Show:       " + album.getAlbum());
+					StringBuilder title = new StringBuilder(album.getAlbum());
+					title.setLength(30);
+					System.out.printf("%-6s | %-30s\n", "Title", title.toString().replace('\u0000', ' '));
+					System.out.println("-------------------------------------------------------------------");
+
 					List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(album.getAlbum_id());
 					seasonsByTvshowId.forEach(season -> {
-						int seasonNumber = seasonCounter.incrementAndGet();
 						Float progressBySeason =
 								seasonDao.getProgressByUserIdAndSeasonId(user.getUser_id(), season.getSeason_id());
+
 						if (null != progressBySeason) {
-							System.out.printf("%s -> %s%n", "Season " + seasonNumber, (progressBySeason * 100) + "%");
+//							System.out.printf("%s -> %s%n", season.getTitle(), (progressBySeason * 100) + "%");
+							if(progressBySeason == 1)
+								System.out.printf("%-6s | %s%-15s -> %s%s\n", "", ConsoleColors.GREEN, season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100), ConsoleColors.RESET);
+							else
+								System.out.printf("%-6s | %-15s -> %s\n", "", season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100));
 						}
 					});
-					seasonCounter.set(0);
+					System.out.println(ConsoleColors.CYAN + "\n\n" + ConsoleColors.RESET);
 				});
+
+				scan.nextLine();
 				break;
 
 			case 5:
@@ -243,7 +273,7 @@ public class Runner {
 		clear();
 
 		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);
-		System.out.println("1: Add/Update Progress");
+		System.out.println("1: Add/Update Progress/Rating");
 		System.out.println("2: Recommend me a show");
 		System.out.println("3: List Albums");
 		System.out.println("4: Logout");
@@ -256,7 +286,7 @@ public class Runner {
 		System.out.println(c.CYAN + "Hello, " + user.getUsername() + c.RESET);
 		System.out.println("You are logged in as an " + c.WHITE_UNDERLINED + "admin." + c.RESET);
 		System.out.println(c.WHITE_BOLD + "1: Add Show" + c.RESET);
-		System.out.println("2: Add/Update Progress");
+		System.out.println("2: Add/Update Progress/Rating");
 		System.out.println("3: Recommend me a show");
 		System.out.println("4: List Shows");
 		System.out.println("5: Logout");

@@ -14,7 +14,7 @@ public class SeasonDaoImpl implements SeasonDao {
 
 	@Override
 	public Integer save(Season season) {
-		String sql = "INSERT INTO seasons(album_id, title) VALUES (?, ?)";
+		String sql = "INSERT INTO seasons(show_id, title) VALUES (?, ?)";
 		try (PreparedStatement ps = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
 			ps.setInt(1, season.getTvshow_id());
 			ps.setString(2, season.getTitle());
@@ -65,7 +65,7 @@ public class SeasonDaoImpl implements SeasonDao {
 
 	@Override
 	public List<Season> getSeasonsByTvshowId(int tvShowId) {
-		String sql = "SELECT * FROM seasons WHERE album_id = ?";
+		String sql = "SELECT * FROM seasons WHERE show_id = ?";
 		List<Season> seasons = new ArrayList<>();
 
 		try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -90,14 +90,13 @@ public class SeasonDaoImpl implements SeasonDao {
 				FROM (SELECT season_id, COUNT(number) AS progress
 							FROM tracks
 							WHERE track_id IN
-										(SELECT track_id from progress where user_id = ? and progress = 'completed')
+							(SELECT track_id from progress where user_id = ? and progress = 'completed')
 							GROUP BY season_id) q1
-								 INNER JOIN (
+								 INNER JOIN
 						(SELECT season_id, COUNT(number) as total
 						 FROM tracks
-						 GROUP BY season_id) q2)
-														ON q1.season_id = q2.season_id
-														
+						 GROUP BY season_id) q2
+						ON q1.season_id = q2.season_id
 				WHERE q1.season_id = ?;
 												""";
 		try (PreparedStatement statement = conn.prepareStatement(sql)) {

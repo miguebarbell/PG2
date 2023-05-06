@@ -21,7 +21,7 @@ public class OpenAI {
 								""".formatted(
 				numberOfSuggestions,
 				tvShowsAndRatings.stream()
-				                 .map(show -> "%s %s/5\n".formatted(show.title(), String.format("%.2f", show.rating())))
+				                 .map(show -> "%s %s/4\n".formatted(show.title(), String.format("%.2f", show.rating())))
 				                 .collect(Collectors.joining())
 		);
 //		System.out.println(prompt);

@@ -23,16 +23,16 @@ public class Populator {
 			                  "password varchar(255)," +
 			                  "user_type INT default 1);");
 
-			statement.execute("CREATE TABLE albums (" +
-			                  "album_id INT auto_increment PRIMARY KEY," +
-			                  "album varchar(255) UNIQUE);");
+			statement.execute("CREATE TABLE tvshows (" +
+			                  "show_id INT auto_increment PRIMARY KEY," +
+			                  "`show` varchar(255) UNIQUE);");
 
 
 			statement.execute("CREATE TABLE seasons(" +
 			                  "season_id INT AUTO_INCREMENT PRIMARY KEY ," +
-			                  "album_id INT NOT NULL," +
+			                  "show_id INT NOT NULL," +
 			                  "title VARCHAR(255) NOT NULL," +
-			                  "foreign key (album_id) references albums(album_id))");
+			                  "foreign key (show_id) references tvshows(show_id))");
 
 			statement.execute("CREATE TABLE tracks(" +
 			                  "track_id INT AUTO_INCREMENT PRIMARY KEY , " +
@@ -63,8 +63,8 @@ public class Populator {
 			statement.execute("INSERT into users(username, password) values ('sean', md5('root'));");
 
 			// BEEF TV SHOW
-			statement.execute("insert into albums(album) values('BEEF');");
-			statement.execute("INSERT INTO seasons(album_id, title) values (1, 'Season 1')");
+			statement.execute("insert into tvshows(`show`) values('BEEF');");
+			statement.execute("INSERT INTO seasons(show_id, title) values (1, 'Season 1')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (1,1,'The Birds Don\\'t Sing, They " +
 			                  "Screech in Pain')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (1,2,'The Rapture of Being Alive')");
@@ -78,8 +78,8 @@ public class Populator {
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (1,10,'Figures of Light')");
 
 			// The Boys
-			statement.execute("insert into albums(album) values('The Boys');");
-			statement.execute("INSERT INTO seasons(album_id, title) values (2, 'Season 1')");
+			statement.execute("insert into tvshows(`show`) values('The Boys');");
+			statement.execute("INSERT INTO seasons(show_id, title) values (2, 'Season 1')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,1,'The Name of the Game')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,2,'Cherry')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,3,'Get Some')");
@@ -89,7 +89,7 @@ public class Populator {
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,7,'The Self-Preservation Society')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (2,8,'You Found Me')");
 
-			statement.execute("INSERT INTO seasons(album_id, title) values (2, 'Season 2')");
+			statement.execute("INSERT INTO seasons(show_id, title) values (2, 'Season 2')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,1,'The Big Ride')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,2,'Proper Preparation and Planning')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,3,'Over the Hill with the Swords of a" +
@@ -101,7 +101,7 @@ public class Populator {
 			                  "Maker')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (3,8,'What I Know')");
 
-			statement.execute("INSERT INTO seasons(album_id, title) values (2, 'Season 3')");
+			statement.execute("INSERT INTO seasons(show_id, title) values (2, 'Season 3')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,1,'Payback')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,2,'The Only Man in the Sky')");
 			statement.execute("INSERT INTO tracks(season_id, number, title) values (4,3,'Barbary Coast')");
@@ -144,20 +144,20 @@ public class Populator {
 			statement.execute("INSERT INTO progress(user_id, track_id, progress) values (2, 8, 'completed')");
 			// give some ratings
 			// user_id 1
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 1, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 1, 4)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 2, 4)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 3, 3)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 4, 3)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 5, 5)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 6, 5)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 5, 2)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 6, 1)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (1, 7, 4)");
 			// user_id 2
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 1, 3)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 2, 2)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 3, 3)");
 			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 4, 3)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 5, 5)");
-			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 6, 0)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 5, 0)");
+			statement.execute("INSERT INTO ratings(user_id, track_id, rating) values (2, 6, 1)");
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
