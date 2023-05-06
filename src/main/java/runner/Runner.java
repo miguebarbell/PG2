@@ -248,11 +248,10 @@ public class Runner {
 
 						if (null != progressBySeason) {
 //							System.out.printf("%s -> %s%n", season.getTitle(), (progressBySeason * 100) + "%");
-							String seasonTitle = season.getTitle();
 							if(progressBySeason == 1)
-								seasonTitle = ConsoleColors.GREEN + season.getTitle();
-							System.out.printf("%-6s | %-10s -> %s\n", "", seasonTitle, ProgressBar.progressBar((int)(progressBySeason * 100), 100));
-							System.out.print(ConsoleColors.RESET);
+								System.out.printf("%-6s | %s%-15s -> %s%s\n", "", ConsoleColors.GREEN, season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100), ConsoleColors.RESET);
+							else
+								System.out.printf("%-6s | %-15s -> %s\n", "", season.getTitle(), ProgressBar.progressBar((int)(progressBySeason * 100), 100));
 						}
 					});
 					System.out.println(ConsoleColors.CYAN + "\n\n" + ConsoleColors.RESET);
