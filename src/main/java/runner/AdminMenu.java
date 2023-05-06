@@ -1,10 +1,9 @@
 package runner;
 
+import java.util.List;
+
 import dao.TvSerieDTO;
 import utility.ConsoleColors;
-
-import java.util.List;
-import java.util.Scanner;
 
 public class AdminMenu {
 	public static boolean blankValidator(String input, String message) {
@@ -45,10 +44,12 @@ public class AdminMenu {
 		String tvTitleChoice;
 		do {
 			Runner.clear();
-			System.out.printf("%s%-4s%s | %-35s | %-15s | %-20s | %-16s\n", ConsoleColors.CYAN, "ID", ConsoleColors.RESET, "Title", "First Air Date", "Number of Seasons", "Number of Episodes");
-			System.out.println("--------------------------------------------------------------------------------------------------------");
+			System.out.printf("%s%-4s%s | %-30s | %-10s | %-10s | %-16s\n", ConsoleColors.CYAN, "ID", ConsoleColors.RESET, "Title", "Date", "Seasons", "Episodes");
+			System.out.println("--------------------------------------------------------------------------");
 			for (int i = 0; i < results.size(); i++) {
-				System.out.printf("%s%-4s%s | %-35s | %-15s | %-20s | %-16s\n", ConsoleColors.CYAN, i + 1, ConsoleColors.RESET, results.get(i).name(),
+				StringBuilder name = new StringBuilder(results.get(i).name());
+				name.setLength(30);
+				System.out.printf("%s%-4s%s | %-30s | %-10s | %-10s | %-16s\n", ConsoleColors.CYAN, i + 1, ConsoleColors.RESET, name.toString(),
 						results.get(i).firstAirDate(), results.get(i).numberOfSeasons(), results.get(i).numberOfEpisodes());
 			}
 			System.out.print("\nSelect ID to Add (q to exit):" + ConsoleColors.YELLOW);
