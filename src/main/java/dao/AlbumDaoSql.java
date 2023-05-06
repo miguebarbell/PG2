@@ -211,7 +211,7 @@ public class AlbumDaoSql implements AlbumDao {
 	}
 
 
-	Float getRatingByAlbumId(Integer showId) {
+	public Float getRatingByAlbumId(Integer showId) {
 		AtomicReference<Float> rating = new AtomicReference<>(0f);
 		AtomicInteger count = new AtomicInteger();
 		SeasonDaoImpl seasonDao = new SeasonDaoImpl();

@@ -211,21 +211,21 @@ public class Runner {
 			case 4:
 				// Showing the show and number of users who have finished watching a show and still watching a show.
 				List<AlbumCompletedDTO> usersCompletedOrInProgress = albumDaoSql.getUsersCompleted();
-				
+
 				System.out.println(ConsoleColors.CYAN_BOLD + "Global User Data" + ConsoleColors.RESET);
 				System.out.printf("%-30s | %-22s | %-16s\n", "Title", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
 				System.out.println("-------------------------------------------------------------------");
 				for(AlbumCompletedDTO ac: usersCompletedOrInProgress) {
 					StringBuilder title = new StringBuilder(ac.album());
 					title.setLength(30);
-					
-					System.out.printf("%-30s | %s%-22s%s | %s%-16s%s\n", title.toString(), ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
+
+					System.out.printf("%-30s | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
 //					System.out.println("Show: " + ac.album() + ",  usersCompleted: " + ac.usersCompletd() + ",  usersWatching: " + ac.usersWatching());
 				}
 				System.out.println(ConsoleColors.RESET);
-				
-				
-				
+
+
+
 				String banner;
 				List<Album> albumsWithProgress = progressDaoSql.getAllAlbumsWithTrackerByUserId(user.getUser_id());
 				if (albumsWithProgress.isEmpty()) {
@@ -238,9 +238,9 @@ public class Runner {
 //					System.out.println("Show:       " + album.getAlbum());
 					StringBuilder title = new StringBuilder(album.getAlbum());
 					title.setLength(30);
-					System.out.printf("%-6s | %-30s\n", "Title", title.toString());
+					System.out.printf("%-6s | %-30s\n", "Title", title.toString().replace('\u0000', ' '));
 					System.out.println("-------------------------------------------------------------------");
-					
+
 					List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(album.getAlbum_id());
 					seasonsByTvshowId.forEach(season -> {
 						Float progressBySeason =
@@ -256,7 +256,7 @@ public class Runner {
 					});
 					System.out.println(ConsoleColors.CYAN + "\n\n" + ConsoleColors.RESET);
 				});
-				
+
 				scan.nextLine();
 				break;
 
