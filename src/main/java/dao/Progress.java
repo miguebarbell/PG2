@@ -7,7 +7,6 @@ public class Progress {
 	private String progress;
 
 	public Progress(int user_id, int track_id, String progress) {
-		//FIXME: progress should be an integer
 		this.user_id = user_id;
 		this.track_id = track_id;
 		this.progress = progress;
