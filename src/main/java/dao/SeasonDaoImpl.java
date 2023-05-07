@@ -98,7 +98,7 @@ public class SeasonDaoImpl implements SeasonDao {
 						 GROUP BY season_id) q2
 						ON q1.season_id = q2.season_id
 				WHERE q1.season_id = ?;
-												""";
+				""";
 		try (PreparedStatement statement = conn.prepareStatement(sql)) {
 			statement.setInt(1, userId);
 			statement.setInt(2,seasonId);

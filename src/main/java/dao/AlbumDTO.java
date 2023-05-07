@@ -1,4 +1,4 @@
 package dao;
 
-public record AlbumDTO(String title, Float rating, Integer recommendation, Float progress) {
+public record AlbumDTO(String title, Float rating, Integer recommendation, Float progress, Integer id) {
 }

@@ -218,13 +218,14 @@ public class Runner {
 				System.out.printf("%-30s | %-22s | %-16s\n", "Title", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
 				System.out.println("-------------------------------------------------------------------");
 
-				
+
 				for(AlbumCompletedDTO ac: usersCompletedOrInProgress) {
 					StringBuilder title = new StringBuilder(ac.album());
 					title.setLength(30);
+					System.out.println("ac.showId() = " + ac.showId());
 //					String showRating = albumDaoSql.getRatingByAlbumId(/*??*/) == null ? "----" : String.valueOf(Math.ceil(albumDaoSql.getRatingByAlbumId(/*??*/)*100)/100);
 //					String showRating = "2.50";
-//					System.out.printf("%-30s | [%-4s] | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), showRating, 
+//					System.out.printf("%-30s | [%-4s] | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), showRating,
 //							ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
 					System.out.printf("%-30s | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
 				}

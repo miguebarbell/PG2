@@ -50,7 +50,7 @@ public class OpenAI {
 				      AlbumDTO albumDTO = new AlbumDTO(
 						      trimmed.split("\\.")[1],
 						      null,
-						      Integer.parseInt(trimmed.split("\\.")[0]), null);
+						      Integer.parseInt(trimmed.split("\\.")[0]), null, null);
 							recommendations.add(albumDTO);
 			      });
 		} catch (Exception e) {

@@ -166,7 +166,7 @@ public class AlbumDaoSql implements AlbumDao {
 				ON seasons.season_id = j1.season_id
 				WHERE show_id = ?
 				GROUP BY show_id;
-						""";
+				""";
 		try (PreparedStatement statement = conn.prepareStatement(sql)) {
 
 			statement.setInt(1, userId);
@@ -202,7 +202,7 @@ public class AlbumDaoSql implements AlbumDao {
 			gmarStmt.setInt(1, userId);
 			ResultSet resultSet = gmarStmt.executeQuery();
 			while (resultSet.next()) {
-				showsRated.add(new AlbumDTO(resultSet.getString(1), resultSet.getFloat(2), null, null));
+				showsRated.add(new AlbumDTO(resultSet.getString(1), resultSet.getFloat(2), null, null, null));
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -255,8 +255,8 @@ FROM tvshows
 				result.add(new AlbumDTO(
 						resultSet.getString(1),
 						null, null,
-						resultSet.getFloat(2)
-				));
+						resultSet.getFloat(2),
+						null));
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -267,10 +267,10 @@ FROM tvshows
 	public List<AlbumCompletedDTO> getUsersCompleted(){
 		List<AlbumCompletedDTO> result = new ArrayList<>();
 		String query = "SELECT  "
-				+ "    q1.`show`, q1.users_completed, q2.users_watching "
+				+ "    q1.`show`, q1.users_completed, q2.users_watching, q1.show_id "
 				+ "FROM "
 				+ "    (SELECT  "
-				+ "        a.`show`, users_completed "
+				+ "        a.`show`, users_completed, a.show_id "
 				+ "    FROM "
 				+ "        tvshows a "
 				+ "    LEFT JOIN (SELECT  "
@@ -379,8 +379,9 @@ FROM tvshows
 				String show = rs.getString("show");
 				int usersCompleted = rs.getInt("users_completed");
 				int usersWatching = rs.getInt("users_watching");
+				int showId = rs.getInt("show_id");
 
-				AlbumCompletedDTO ac = new AlbumCompletedDTO(show, usersCompleted, usersWatching);
+				AlbumCompletedDTO ac = new AlbumCompletedDTO(show, usersCompleted, usersWatching, showId);
 				result.add(ac);
 
 			}
