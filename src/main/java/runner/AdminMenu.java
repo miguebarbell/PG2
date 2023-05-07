@@ -49,7 +49,7 @@ public class AdminMenu {
 			for (int i = 0; i < results.size(); i++) {
 				StringBuilder name = new StringBuilder(results.get(i).name());
 				name.setLength(30);
-				System.out.printf("%s%-4s%s | %-30s | %-10s | %-10s | %-16s\n", ConsoleColors.CYAN, i + 1, ConsoleColors.RESET, name.toString(),
+				System.out.printf("%s%-4s%s | %-30s | %-10s | %-10s | %-16s\n", ConsoleColors.CYAN, i + 1, ConsoleColors.RESET, name.toString().replace('\u0000', ' '),
 						results.get(i).firstAirDate(), results.get(i).numberOfSeasons(), results.get(i).numberOfEpisodes());
 			}
 			System.out.print("\nSelect ID to Add (q to exit):" + ConsoleColors.YELLOW);

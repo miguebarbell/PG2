@@ -31,11 +31,17 @@ This works with a MySQL database, so that service needs to be available and runn
 
 ## Screenshots
 
+### Example of the workflow
+>The idea is showing how the statistics change when you add a new rating or progress to a show.
+
+![current version](./doc/workflow.gif)
+
 ### This is an example of the workflow for the old app
 
 ![old app](./doc/old_tracker.gif)
 
 ### This is an example of what is going on internally with chat gpt.
+Internally it gets all the ratings that you have made, and with that information asks ChatGPT.
 
 ![example of a prompt](./doc/example_of_prompt.png)
 
