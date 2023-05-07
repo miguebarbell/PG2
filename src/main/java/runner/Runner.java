@@ -213,21 +213,16 @@ public class Runner {
 				List<AlbumCompletedDTO> usersCompletedOrInProgress = albumDaoSql.getUsersCompleted();
 
 				System.out.println(ConsoleColors.CYAN_BOLD + "Global User Data" + ConsoleColors.RESET);
-//				System.out.printf("%-30s | %-6s | %-22s | %-16s\n", "Title", "Rating", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
-//				System.out.println("----------------------------------------------------------------------------");
-				System.out.printf("%-30s | %-22s | %-16s\n", "Title", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
-				System.out.println("-------------------------------------------------------------------");
+				System.out.printf("%-30s | %-6s | %-22s | %-16s\n", "Title", "Rating", ConsoleColors.YELLOW + "Watching (In Progress)" + ConsoleColors.RESET, ConsoleColors.GREEN + "Completed" + ConsoleColors.RESET);
+				System.out.println("----------------------------------------------------------------------------");
 
 
 				for(AlbumCompletedDTO ac: usersCompletedOrInProgress) {
 					StringBuilder title = new StringBuilder(ac.album());
 					title.setLength(30);
-					System.out.println("ac.showId() = " + ac.showId());
-//					String showRating = albumDaoSql.getRatingByAlbumId(/*??*/) == null ? "----" : String.valueOf(Math.ceil(albumDaoSql.getRatingByAlbumId(/*??*/)*100)/100);
-//					String showRating = "2.50";
-//					System.out.printf("%-30s | [%-4s] | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), showRating,
-//							ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
-					System.out.printf("%-30s | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
+					String showRating = albumDaoSql.getRatingByAlbumId(ac.showId()) == null ? "----" : String.valueOf(Math.ceil(albumDaoSql.getRatingByAlbumId(ac.showId())*100)/100);
+					System.out.printf("%-30s | [%-4s] | %s%-22s%s | %s%-16s%s\n", title.toString().replace('\u0000', ' '), showRating,
+							ConsoleColors.YELLOW, ac.usersWatching(), ConsoleColors.RESET, ConsoleColors.GREEN, ac.usersCompletd(), ConsoleColors.RESET);
 				}
 				System.out.println(ConsoleColors.RESET);
 
@@ -246,8 +241,8 @@ public class Runner {
 					title.setLength(30);
 					String showRating = albumDaoSql.getRatingByAlbumId(album.getAlbum_id()) == null ? "----" : String.valueOf(Math.ceil(albumDaoSql.getRatingByAlbumId(album.getAlbum_id())*100)/100);
 					System.out.printf("[%-4s] | %-30s\n", showRating, title.toString().replace('\u0000', ' '));
-//					System.out.println("----------------------------------------------------------------------------");
-					System.out.println("-------------------------------------------------------------------");
+					System.out.println("----------------------------------------------------------------------------");
+//					System.out.println("-------------------------------------------------------------------");
 					List<Season> seasonsByTvshowId = seasonDao.getSeasonsByTvshowId(album.getAlbum_id());
 					seasonsByTvshowId.forEach(season -> {
 						Float progressBySeason =
